@@ -1,0 +1,5 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/blog';
+---
+<BaseLayout title="页面走丢了" noindex><section class="card error-page"><div class="error-number">404</div><h1>这一页，暂时没有故事。</h1><p>链接可能已经变更，去首页或归档里找找吧。</p><div class="error-links"><a href={url('')} class="button">返回首页</a><a href={url('archive/')} class="button secondary">翻阅归档</a></div></section></BaseLayout>

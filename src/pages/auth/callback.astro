@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { backendConfig } from '../../lib/backend';
+import { url } from '../../lib/blog';
+---
+<BaseLayout title="验证账户" noindex><section class="card content-card" id="auth-callback" data-enabled={backendConfig.configured} data-account={url('account/')}><h1 class="section-heading">验证账户</h1><p id="callback-status" class="form-status" role="status">{backendConfig.configured ? '正在验证邮件链接，请稍候…' : '账户服务尚未开放。'}</p><a class="button secondary" href={url('account/')}>返回账户页面</a><noscript><p>请启用 JavaScript 后重新打开邮件链接。</p></noscript></section></BaseLayout>
+<script>
+  import { backend, backendError } from '../../lib/backend';
+  const app = document.querySelector<HTMLElement>('#auth-callback')!;
+  const status = document.querySelector<HTMLElement>('#callback-status')!;
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  const recovery = params.get('flow') === 'recovery';
+  // 清除地址栏中的一次性授权码；只在内存中交给官方 SDK。
+  history.replaceState({}, '', location.pathname);
+  if (backend && app.dataset.enabled === 'true') {
+    if (!code || params.has('error')) status.textContent = '验证链接无效或已过期，请回到账户页重新发送邮件。';
+    else void backend.auth.exchangeCodeForSession(code).then(({ error }) => {
+      if (error) { status.textContent = backendError(error); return; }
+      status.textContent = recovery ? '验证完成，正在前往设置新密码…' : '邮箱验证完成，正在前往账户页面…';
+      location.replace(app.dataset.account! + (recovery ? '?mode=password#password-form' : ''));
+    }).catch(() => { status.textContent = '验证服务暂时不可用，请检查网络后重新申请邮件链接。'; });
+  }
+</script>

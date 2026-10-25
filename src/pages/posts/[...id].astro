@@ -1,0 +1,24 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Comments from '../../components/Comments.astro';
+import { categoryUrl, formatDate, getPosts, postUrl, readingMinutes, tagUrl, url } from '../../lib/blog';
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, index) => ({ params: { id: post.id }, props: { post, newer: posts[index - 1], older: posts[index + 1] } }));
+}
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+---
+<BaseLayout title={post.data.title} description={post.data.description} headings={headings} published={post.data.published} updated={post.data.updated} type="article">
+  <article class="card article-card">
+    <header class="article-header"><a class="article-category" href={categoryUrl(post.data.category)}><Icon name="folder" size={14}/>{post.data.category}</a><h1>{post.data.title}</h1><div class="post-meta"><span><Icon name="calendar" size={14}/><time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time></span><span><Icon name="clock" size={14}/>{readingMinutes(post)} 分钟阅读</span>{post.data.updated && <span>更新于 <time datetime={post.data.updated.toISOString()}>{formatDate(post.data.updated)}</time></span>}</div><p class="article-description">{post.data.description}</p></header>
+    <div class:list={['article-cover', `tone-${post.data.color}`]}>{post.data.cover && <img src={url(post.data.cover)} alt={`${post.data.title} 封面`} width="900" height="350"/>}</div>
+    {headings.length > 0 && <details class="mobile-toc"><summary>文章目录</summary><ol>{headings.filter(h => h.depth <= 3).map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></details>}
+    <div class="prose"><Content/></div>
+    <footer class="article-footer"><div class="tag-row">{post.data.tags.map(tag => <a href={tagUrl(tag)}>#{tag}</a>)}</div><button class="button secondary" type="button" id="copy-link" hidden><Icon name="copy" size={14}/>复制链接</button></footer>
+  </article>
+  <nav class="post-navigation" aria-label="相邻文章">{newer ? <a href={postUrl(newer)} class="card"><small>← 新一篇</small><span>{newer.data.title}</span></a> : <a href={url('archive/')} class="card"><small>回到时间线</small><span>查看全部文章</span></a>}{older ? <a href={postUrl(older)} class="card"><small>旧一篇 →</small><span>{older.data.title}</span></a> : <a href={url('')} class="card"><small>故事从这里开始</small><span>回到首页 →</span></a>}</nav>
+  <Comments postId={post.id}/>
+</BaseLayout>

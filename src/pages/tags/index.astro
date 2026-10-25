@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, taxonomy, tagUrl } from '../../lib/blog';
+const tags = taxonomy(await getPosts(), 'tags');
+---
+<BaseLayout title="标签漫游"><header class="page-intro card"><p class="eyebrow">FOLLOW A LITTLE CURIOSITY</p><h1>标签漫游</h1><p>一些关键词，把不同的记录悄悄串在一起。</p></header><div class="all-tags card">{tags.map(([name, count]) => <a href={tagUrl(name)}>#{name}<span>{count}</span></a>)}</div></BaseLayout>

@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { categoryUrl, formatDate, getPosts, postUrl, yearOf } from '../lib/blog';
+const posts = await getPosts();
+const years = [...new Set(posts.map(p => yearOf(p.data.published)))];
+---
+<BaseLayout title="时光归档">
+  <header class="page-intro card"><p class="eyebrow">EVERY NOTE HAS ITS MOMENT</p><h1>时光归档</h1><p>让零散的记录，连成一条时间线。共 {posts.length} 篇文章。</p></header>
+  <div class="card content-card">{years.map(year => <section class="archive-year" id={`year-${year}`}><h2 class="section-heading">{year}<span>{posts.filter(p => yearOf(p.data.published) === year).length} 篇记录</span></h2><ol class="archive-list">{posts.filter(p => yearOf(p.data.published) === year).map(post => <li><time datetime={post.data.published.toISOString()}>{formatDate(post.data.published).slice(5)}</time><div><h3><a href={postUrl(post)}>{post.data.title}</a></h3><a class="archive-category" href={categoryUrl(post.data.category)}>{post.data.category}</a></div></li>)}</ol></section>)}{!posts.length && <p class="muted">还没有发布的文章。</p>}</div>
+</BaseLayout>

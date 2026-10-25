@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { categoryUrl, getPosts, taxonomy } from '../../lib/blog';
+const categories = taxonomy(await getPosts(), 'category');
+---
+<BaseLayout title="文章分类"><header class="page-intro card"><p class="eyebrow">FIND YOUR OWN PATH</p><h1>文章分类</h1><p>从一个感兴趣的话题开始，看看这里都写了些什么。</p></header><div class="taxonomy-grid">{categories.map(([name, count]) => <a class="card taxonomy-card" href={categoryUrl(name)}><span class="taxonomy-icon"><Icon name="folder"/></span><div><h2>{name}</h2><p>{count} 篇文章</p></div><Icon name="arrow" size={17}/></a>)}</div></BaseLayout>

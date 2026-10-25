@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { siteConfig } from '../../site.config.mjs';
+---
+<BaseLayout title="友链与灵感"><header class="page-intro card"><p class="eyebrow">THE INTERNET IS A GARDEN</p><h1>友链与灵感</h1><p>分享喜欢的站点，也向帮助这个小站诞生的开源项目致谢。</p></header><div class="friends-grid">{siteConfig.friends.map(friend => <a href={friend.url} class="card friend-card" target="_blank" rel="noopener noreferrer"><span class="friend-avatar" style={`background:${friend.color}`}>{friend.name.slice(0, 1)}</span><div class="friend-title"><h2>{friend.name}</h2><Icon name="external" size={15}/></div><p>{friend.description}</p></a>)}</div><section class="card content-card"><div class="prose"><h2 style="margin-top:0">关于这份清单</h2><p>这里收录的是本站使用的工具与设计参考，不代表与这些站点建立了互换友链关系。以后也会慢慢加入更多值得阅读的个人博客。</p>{siteConfig.email && <p>如果你想交换友链，可以<a href={`mailto:${siteConfig.email}?subject=${encodeURIComponent('友链交流')}`}>给我写信</a>，附上站点名称、网址和一句介绍。</p>}</div></section></BaseLayout>

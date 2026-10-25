@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { getPosts, taxonomy, url } from '../../lib/blog';
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return taxonomy(posts, 'tags').map(([tag]) => ({ params: { tag }, props: { tag, posts: posts.filter(p => p.data.tags.includes(tag)) } }));
+}
+const { tag, posts } = Astro.props;
+---
+<BaseLayout title={`#${tag} · 标签`}><header class="page-intro card"><a class="back-link" href={url('tags/')}><Icon name="back" size={14}/>所有标签</a><p class="eyebrow">EXPLORE BY TAG</p><h1>#{tag}</h1><p>与「{tag}」有关的 {posts.length} 篇记录。</p></header><div class="post-list">{posts.map((post, index) => <PostCard post={post} index={index}/>)}</div></BaseLayout>

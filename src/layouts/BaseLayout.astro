@@ -1,0 +1,102 @@
+---
+import '../styles/global.css';
+import { siteConfig } from '../../site.config.mjs';
+import { absolute, categoryUrl, getPosts, taxonomy, tagUrl, url, yearOf } from '../lib/blog';
+import Icon from '../components/Icon.astro';
+import { authEnabled } from '../lib/backend';
+interface Props {
+  title?: string; description?: string; hero?: boolean; noindex?: boolean;
+  headings?: { depth: number; slug: string; text: string }[];
+  published?: Date; updated?: Date; type?: 'website' | 'article';
+}
+const { title, description = siteConfig.description, hero = false, noindex = false, headings = [], published, updated, type = 'website' } = Astro.props;
+const posts = await getPosts();
+const categories = taxonomy(posts, 'category');
+const tags = taxonomy(posts, 'tags');
+const years = [...new Set(posts.map(p => yearOf(p.data.published)))];
+const path = decodeURI(Astro.url.pathname).replace(siteConfig.base.replace(/\/$/, ''), '');
+const nav = [{ label: '首页', path: '' }, { label: '归档', path: 'archive/' }, { label: '分类', path: 'categories/' }, { label: '友链', path: 'friends/' }, { label: '关于', path: 'about/' }, ...(authEnabled ? [{ label: '账户', path: 'account/' }] : [])];
+const pageTitle = title ? `${title} · ${siteConfig.title}` : `${siteConfig.title} · ${siteConfig.subtitle}`;
+const canonical = absolute(Astro.url.pathname.replace(siteConfig.base, ''));
+---
+<!doctype html>
+<html lang={siteConfig.language}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f4f6f4" />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex,follow" />}
+    <title>{pageTitle}</title>
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.title} RSS`} href={url('rss.xml')} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={siteConfig.title} />
+    <meta property="og:locale" content="zh_CN" />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {updated && <meta property="article:modified_time" content={updated.toISOString()} />}
+    <script is:inline>
+      try {
+        const prefs = JSON.parse(localStorage.getItem('qiguang-prefs') || '{}');
+        const mode = ['light', 'dark', 'system'].includes(prefs.theme) ? prefs.theme : 'system';
+        document.documentElement.dataset.theme = mode === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode;
+        document.documentElement.dataset.accent = ['sage', 'blue', 'rose'].includes(prefs.accent) ? prefs.accent : 'sage';
+        if (prefs.font >= 15 && prefs.font <= 20) document.documentElement.style.setProperty('--reading-size', prefs.font + 'px');
+      } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到内容</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href={url('')} aria-label={`${siteConfig.title} 首页`}><span class="brand-mark"><Icon name="leaf" size={23}/></span><span>{siteConfig.title}<small>{siteConfig.subtitle}</small></span></a>
+        <nav class="desktop-nav" aria-label="主导航">{nav.map(item => <a href={url(item.path)} aria-current={(item.path ? path.startsWith(`/${item.path}`) : path === '/') ? 'page' : undefined}>{item.label}</a>)}</nav>
+        <div class="header-tools">
+          <a class="search-shortcut" href={url('search/')} aria-label="搜索文章"><Icon name="search" size={18}/><span>搜索文章</span><kbd>/</kbd></a>
+          <button class="icon-button" id="theme-toggle" aria-label="切换深浅色" title="切换深浅色" hidden><Icon name="moon" size={19}/></button>
+          <button class="icon-button" id="settings-open" aria-label="阅读偏好设置" title="阅读偏好设置" hidden><Icon name="settings" size={20}/></button>
+          <button class="icon-button mobile-menu-button" id="menu-toggle" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-nav" hidden><Icon name="menu" size={21}/></button>
+        </div>
+      </div>
+      <nav id="mobile-nav" class="mobile-nav" aria-label="移动端导航">{nav.map(item => <a href={url(item.path)}>{item.label}</a>)}<a href={url('search/')}>搜索</a></nav>
+    </header>
+    {hero && <section class="hero" style={`background-color:${siteConfig.hero.background}`}>
+      {siteConfig.hero.image && <img src={url(siteConfig.hero.image)} alt="" class="hero-image" fetchpriority="high" />}
+      <div class="hero-inner"><p class="eyebrow">{siteConfig.hero.eyebrow}</p><h1>{siteConfig.hero.title}</h1><p class="hero-description">{siteConfig.hero.description}</p><span class="hero-bottom">{siteConfig.title.toUpperCase()} <span> / </span> PERSONAL JOURNAL</span></div>
+    </section>}
+    <div class:list={['site-grid', { 'with-hero': hero }]}>
+      <aside class="left-sidebar" aria-label="博客信息">
+        <section class="card profile-card">
+          <div class="profile-strip"></div>
+          <a class="avatar" href={url('about/')} aria-label="关于博主">{siteConfig.avatar ? <img src={url(siteConfig.avatar)} alt={siteConfig.author} width="80" height="80" /> : <Icon name="leaf" size={34}/>}</a>
+          <h2>{siteConfig.author}</h2><p class="profile-bio">{siteConfig.bio}</p>
+          <div class="profile-stats"><a href={url('archive/')}><strong>{posts.length}</strong><span>文章</span></a><a href={url('categories/')}><strong>{categories.length}</strong><span>分类</span></a><a href={url('tags/')}><strong>{tags.length}</strong><span>标签</span></a></div>
+          <div class="social-links">{siteConfig.github && <a href={siteConfig.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><Icon name="github" size={19}/></a>}{siteConfig.email && <a href={`mailto:${siteConfig.email}`} aria-label="发送邮件"><Icon name="mail" size={19}/></a>}<a href={url('rss.xml')} aria-label="RSS 订阅" title="RSS 订阅"><Icon name="rss" size={18}/></a><a href={url('about/')} class="profile-more">认识一下 <Icon name="arrow" size={15}/></a></div>
+        </section>
+        <section class="card sidebar-card"><h2><Icon name="folder" size={17}/>文章分类<a href={url('categories/')} aria-label="查看所有分类"><Icon name="arrow" size={15}/></a></h2><div class="category-list">{categories.map(([name, count]) => <a href={categoryUrl(name)}><span>{name}</span><span class="count">{count}</span></a>)}</div></section>
+        <section class="card sidebar-card tag-cloud"><h2><Icon name="tag" size={17}/>标签漫游</h2><div class="tag-row">{tags.map(([name, count]) => <a href={tagUrl(name)} aria-label={`${name}，${count} 篇文章`}>{name}</a>)}</div></section>
+      </aside>
+      <main id="main" tabindex="-1"><slot /></main>
+      <aside class="right-sidebar" aria-label={headings.length ? '文章目录' : '更多内容'}>
+        {headings.length > 0 ? <section class="card sidebar-card toc-card"><h2><Icon name="book" size={17}/>文章目录</h2><nav aria-label="文章目录"><ol>{headings.filter(h => h.depth <= 3).map(h => <li class:list={[{ 'toc-sub': h.depth > 2 }]}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></nav></section> : <>
+          <section class="card quiet-card"><span class="eyebrow">A SMALL REMINDER</span><Icon name="leaf" size={28}/><p>不必匆忙，<br/>好的故事<br/>正在慢慢发生。</p><span class="quiet-line"></span><small>留一点时间，给自己。</small></section>
+          <section class="card sidebar-card"><h2><Icon name="calendar" size={17}/>时光归档</h2><div class="category-list">{years.map(year => <a href={url(`archive/#year-${year}`)}><span>{year}</span><span class="count">{posts.filter(p => yearOf(p.data.published) === year).length}</span></a>)}</div><a class="text-link" href={url('archive/')}>翻阅全部记录 <Icon name="arrow" size={15}/></a></section>
+          <a class="card rss-card" href={url('rss.xml')}><span class="rss-icon"><Icon name="rss" size={21}/></span><span><strong>订阅新的故事</strong><small>通过 RSS 阅读器接收更新</small></span><Icon name="external" size={15}/></a>
+        </>}
+        <div class="aside-caption">WORDS TAKE ROOT.<br/>LIFE FINDS ITS LIGHT.</div>
+      </aside>
+    </div>
+    <footer class="site-footer"><div><a class="footer-brand" href={url('')}><Icon name="leaf" size={17}/>{siteConfig.title}</a><p>© {new Date().getFullYear()} {siteConfig.author} · {siteConfig.subtitle}</p></div><div><p>Built with <a href="https://astro.build/" target="_blank" rel="noopener noreferrer">Astro</a> · Hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a></p><p>设计参考 <a href="https://github.com/CuteLeaf/Firefly" target="_blank" rel="noopener noreferrer">Firefly</a> / <a href="https://seasir.top/" target="_blank" rel="noopener noreferrer">Hyde Blog</a> · <a href={url('rss.xml')}>RSS</a> · <a href={url('sitemap.xml')}>站点地图</a> · <a href={url('privacy/')}>隐私说明</a></p></div></footer>
+    <button class="back-to-top icon-button" id="back-to-top" aria-label="返回顶部" hidden><Icon name="up" size={23}/></button>
+    <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="settings-title">阅读偏好</h2></div><button class="icon-button" id="settings-close" aria-label="关闭阅读设置"><Icon name="close"/></button></div><p class="settings-description">设置保存在当前浏览器，下次来访依然生效。</p><fieldset><legend>外观模式</legend><div class="segmented"><label><input type="radio" name="theme" value="light"/>浅色</label><label><input type="radio" name="theme" value="dark"/>深色</label><label><input type="radio" name="theme" value="system"/>跟随系统</label></div></fieldset><fieldset><legend>主题颜色</legend><div class="accent-options"><label><input type="radio" name="accent" value="sage"/>苔绿</label><label><input type="radio" name="accent" value="blue"/>雾蓝</label><label><input type="radio" name="accent" value="rose"/>浅莓</label></div></fieldset><label class="font-setting" for="reading-font">文章字号 <output id="font-output" for="reading-font">17px</output></label><input id="reading-font" type="range" min="15" max="20" step="1" value="17"/><button class="button secondary reset-settings" id="reset-settings">恢复默认设置</button></dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

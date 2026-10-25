@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Feed from '../../components/Feed.astro';
+import { siteConfig } from '../../../site.config.mjs';
+import { getPosts } from '../../lib/blog';
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return Array.from({ length: Math.max(0, Math.ceil(posts.length / siteConfig.postsPerPage) - 1) }, (_, i) => ({ params: { page: String(i + 2) } }));
+}
+const current = Number(Astro.params.page);
+---
+<BaseLayout title={`文章 · 第 ${current} 页`} hero><Feed current={current}/></BaseLayout>

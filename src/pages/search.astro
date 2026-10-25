@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { getPosts, postUrl, url } from '../lib/blog';
+const posts = await getPosts();
+---
+<BaseLayout title="搜索文章" noindex><header class="page-intro card"><p class="eyebrow">LOOKING FOR SOMETHING?</p><h1>找一找，读一读。</h1><p>搜索标题、正文、分类与标签。多个关键词之间用空格分开。</p><form class="search-form" id="search-form" role="search" action={url('search/')}><div class="search-input-wrap"><Icon name="search" size={18}/><input id="search-input" type="search" name="q" placeholder="输入你感兴趣的关键词…" aria-label="搜索关键词" maxlength="160" autocomplete="off"/></div><button type="submit" class="button">搜索</button></form><div class="search-help"><kbd>/</kbd> 快速聚焦搜索框 <span>·</span> 回车开始搜索</div></header><section id="search-app" data-index={url('search-index.json')} aria-label="搜索结果"><p id="search-status" class="search-status" role="status" aria-live="polite">输入关键词，寻找一篇想读的文章。</p><div id="search-results"></div></section><noscript><div class="card content-card"><p>全文搜索需要启用 JavaScript，也可以直接浏览所有文章：</p><ul>{posts.map(post => <li><a href={postUrl(post)}>{post.data.title}</a></li>)}</ul></div></noscript></BaseLayout>
+<script>
+  import { excerpt, searchEntries, type SearchEntry } from '../lib/search';
+  const form = document.querySelector<HTMLFormElement>('#search-form')!;
+  const input = document.querySelector<HTMLInputElement>('#search-input')!;
+  const results = document.querySelector<HTMLElement>('#search-results')!;
+  const status = document.querySelector<HTMLElement>('#search-status')!;
+  const app = document.querySelector<HTMLElement>('#search-app')!;
+  let indexPromise: Promise<SearchEntry[]> | undefined;
+  let run = 0;
+  async function loadIndex() {
+    if (!indexPromise) indexPromise = fetch(app.dataset.index!).then(response => {
+      if (!response.ok) throw new Error('Index unavailable');
+      return response.json() as Promise<SearchEntry[]>;
+    }).catch(error => { indexPromise = undefined; throw error; });
+    return indexPromise;
+  }
+  async function search(updateHistory: boolean) {
+    const id = ++run;
+    const query = input.value.trim().slice(0, 160);
+    if (updateHistory) { const address = new URL(location.href); if (query) address.searchParams.set('q', query); else address.searchParams.delete('q'); history.pushState({}, '', address); }
+    results.replaceChildren();
+    if (!query) { status.textContent = '输入关键词，寻找一篇想读的文章。'; app.removeAttribute('aria-busy'); return; }
+    status.textContent = '正在查找文章…'; app.setAttribute('aria-busy', 'true');
+    try {
+      const entries = await loadIndex();
+      if (id !== run) return;
+      const found = searchEntries(entries, query);
+      status.textContent = `「${query}」找到 ${found.length} 篇文章`;
+      if (!found.length) {
+        const empty = document.createElement('div'); empty.className = 'card empty-state';
+        const heading = document.createElement('h2'); heading.textContent = '暂时没有找到';
+        const tip = document.createElement('p'); tip.textContent = '试试缩短关键词，或换一个分类、标签名称。';
+        empty.append(heading, tip); results.append(empty);
+      }
+      for (const entry of found) {
+        const link = document.createElement('a'); link.className = 'card search-result'; link.href = entry.url;
+        const title = document.createElement('h2'); title.textContent = entry.title;
+        const meta = document.createElement('div'); meta.className = 'search-result-meta'; meta.textContent = `${entry.date} · ${entry.category} · ${entry.tags.map(tag => '#' + tag).join(' ')}`;
+        const text = document.createElement('p'); text.textContent = excerpt(entry.body, query);
+        link.append(title, meta, text); results.append(link);
+      }
+    } catch {
+      if (id !== run) return;
+      status.textContent = '搜索索引暂时未能加载，请检查网络后再次点击搜索。也可以从归档页浏览文章。';
+    } finally { if (id === run) app.removeAttribute('aria-busy'); }
+  }
+  form.addEventListener('submit', e => { e.preventDefault(); void search(true); });
+  input.addEventListener('search', () => { if (!input.value) void search(true); });
+  addEventListener('popstate', () => { input.value = new URLSearchParams(location.search).get('q')?.slice(0, 160) || ''; void search(false); });
+  input.value = new URLSearchParams(location.search).get('q')?.slice(0, 160) || '';
+  if (input.value) void search(false);
+</script>

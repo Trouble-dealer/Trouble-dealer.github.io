@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { authEnabled } from '../lib/backend';
+import { url } from '../lib/blog';
+---
+<BaseLayout title="读者账户" noindex>
+  <header class="page-intro card"><p class="eyebrow">WELCOME TO JUYE</p><h1>读者账户</h1><p>用邮箱注册，验证后即可在文章下交流。文章始终可以直接阅读。</p></header>
+  {!authEnabled ? <section class="card content-card"><h2 class="section-heading">账户服务尚未开放</h2><p class="muted">博主正在配置邮箱验证与评论服务。准备好后，这里会开放真实的注册和登录。</p><a class="text-link" href={url('')}>先去阅读文章 →</a></section> : <section class="card content-card account-panel" id="account-app" data-callback={url('auth/callback/')}>
+    <p id="account-status" class="form-status" role="status" aria-live="polite">正在检查登录状态…</p>
+    <div id="account-guest" hidden>
+      <div class="account-tabs" aria-label="账户操作"><button type="button" data-mode="login" class="button">登录</button><button type="button" data-mode="signup" class="button secondary">注册</button><button type="button" data-mode="reset" class="button secondary">忘记密码</button></div>
+      <form id="login-form" class="stack-form" hidden><h2>欢迎回来</h2><label>邮箱<input type="email" name="email" autocomplete="email" required maxlength="254"/></label><label>密码<input type="password" name="password" autocomplete="current-password" required maxlength="128"/></label><button class="button" type="submit">登录</button></form>
+      <form id="signup-form" class="stack-form" hidden><h2>创建读者账户</h2><label>公开昵称<input name="nickname" autocomplete="nickname" required minlength="2" maxlength="40"/></label><label>邮箱<input type="email" name="email" autocomplete="email" required maxlength="254"/></label><label>密码<input type="password" name="password" autocomplete="new-password" required minlength="12" maxlength="128" aria-describedby="password-help"/></label><p id="password-help" class="form-help">至少 12 位。请使用不与其他网站重复的密码。</p><label>再次输入密码<input type="password" name="confirm" autocomplete="new-password" required minlength="12" maxlength="128"/></label><label class="check-label"><input type="checkbox" required/>我已阅读<a href={url('privacy/')} target="_blank" rel="noopener noreferrer">隐私说明</a>，了解评论会公开，邮箱不会显示在评论中。</label><button class="button" type="submit">注册并发送验证邮件</button><p class="form-help">验证邮件请在发起注册的浏览器中打开。为保护账户信息，发送提示不代表邮箱一定尚未注册。</p></form>
+      <form id="reset-form" class="stack-form" hidden><h2>找回账户</h2><label>注册邮箱<input type="email" name="email" autocomplete="email" required maxlength="254"/></label><button class="button" type="submit">发送重设密码邮件</button><p class="form-help">如果邮箱对应已注册账户，你会收到邮件。请在当前浏览器中打开邮件链接。</p></form>
+      <form id="resend-form" class="stack-form resend-form"><h3>没有收到验证邮件？</h3><label>邮箱<input type="email" name="email" autocomplete="email" required maxlength="254"/></label><button class="button secondary" type="submit">重新发送验证邮件</button></form>
+    </div>
+    <div id="account-member" hidden>
+      <div class="member-heading"><div><h2 id="member-name">读者</h2><p id="member-email" class="muted"></p></div><button type="button" id="signout" class="button secondary">退出登录</button></div>
+      <p class="form-help">这是用于文章交流的读者账户，不具备博客管理权限。评论提交后需经博主审核。</p>
+      <a id="account-return" class="text-link" href={url('')}>返回阅读 →</a>
+      <form id="nickname-form" class="stack-form"><h3>修改公开昵称</h3><label>新昵称<input name="nickname" required minlength="2" maxlength="40" autocomplete="nickname"/></label><button class="button secondary" type="submit">保存昵称</button><p class="form-help">只影响之后提交的评论，已提交的评论保留当时昵称。</p></form>
+      <form id="password-form" class="stack-form"><h3>设置新密码</h3><label>新密码<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"/></label><label>再次输入新密码<input name="confirm" type="password" required minlength="12" maxlength="128" autocomplete="new-password"/></label><button class="button secondary" type="submit">保存新密码</button><p class="form-help">重设链接有效且处于登录状态时才能更新；服务可能要求重新验证身份。</p></form>
+      <p class="form-help">如需删除账户及相关评论，请使用注册邮箱联系博主；不要在邮件中提供密码。</p>
+    </div>
+    <noscript><p>注册与登录需要启用 JavaScript。你仍然可以直接阅读文章。</p></noscript>
+  </section>}
+</BaseLayout>
+<script>import '../scripts/account';</script>
