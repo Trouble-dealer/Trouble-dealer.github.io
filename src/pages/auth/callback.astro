@@ -10,11 +10,25 @@ import { url } from '../../lib/blog';
   const status = document.querySelector<HTMLElement>('#callback-status')!;
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
+  const fragment = new URLSearchParams(location.hash.slice(1));
+  const errorCode = params.get('error_code') || fragment.get('error_code');
+  const hasError = params.has('error') || fragment.has('error');
   const recovery = params.get('flow') === 'recovery';
   // 清除地址栏中的一次性授权码；只在内存中交给官方 SDK。
   history.replaceState({}, '', location.pathname);
   if (backend && app.dataset.enabled === 'true') {
-    if (!code || params.has('error')) status.textContent = '验证链接无效或已过期，请回到账户页重新发送邮件。';
+    if (hasError) {
+      status.textContent = errorCode === 'otp_expired'
+        ? '这条邮件链接已过期或已使用。如果已经验证过邮箱，请返回账户页直接登录；否则重新发送验证邮件。'
+        : '邮件验证未完成，请返回账户页重试。若邮箱已验证，可以直接登录。';
+    }
+    else if (!code) {
+      // 重发邮件、链接被再次打开或无参数访问，都不代表邮箱验证失败。
+      // 不把 URL 中的任意会话 token 直接导入，改由用户正常密码登录。
+      status.textContent = recovery
+        ? '没有收到重设密码所需的授权码。请回到账户页重新申请重设邮件，并在发起请求的同一浏览器中打开最新链接。'
+        : '此页面未收到自动登录所需的授权码，这不代表邮箱验证失败。如果你刚点击了验证邮件，请返回账户页，用注册邮箱和密码登录；若仍提示邮箱未验证，再重新发送邮件。';
+    }
     else void backend.auth.exchangeCodeForSession(code).then(({ error }) => {
       if (error) { status.textContent = backendError(error); return; }
       status.textContent = recovery ? '验证完成，正在前往设置新密码…' : '邮箱验证完成，正在前往账户页面…';

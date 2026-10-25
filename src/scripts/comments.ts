@@ -93,7 +93,7 @@ if (app && backend) {
       try {
         const { error } = await client.from('comments').insert({ post_id: app!.dataset.post!, body });
         if (error) { message(backendError(error), true); return; }
-        form.reset(); await load(true, '评论已保存，审核通过后公开。你现在可以看到自己的待审核评论。');
+        form.reset(); await load(true, '评论已发布，所有访客现在都可以看到。');
       } catch { message('提交未完成。正文已保留，请检查网络后重试。', true); }
       finally { submitting = false; submit.disabled = false; }
     })();

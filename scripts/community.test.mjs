@@ -37,13 +37,15 @@ test('未验证邮箱不能提交；无效文章也不能提交', async () => {
   await assert.rejects(as('authenticated', unverified, "insert into public.comments (post_id,body) values ('welcome','未验证评论')"), /verified_email_required/);
   await assert.rejects(as('authenticated', alice, "insert into public.comments (post_id,body) values ('nonexistent','无效文章评论')"), /post_comments_unavailable/);
 });
-test('已验证用户提交后，作者与待审状态由数据库确定', async () => {
+test('已验证用户提交后，数据库直接公开并确定作者', async () => {
   const result = await as('authenticated', alice, "insert into public.comments (post_id,body) values ('welcome','<script>不会执行的纯文本</script>') returning *");
   comment = result.rows[0];
-  assert.equal(comment.user_id, alice); assert.equal(comment.author_name, 'Alice'); assert.equal(comment.status, 'pending');
+  assert.equal(comment.user_id, alice); assert.equal(comment.author_name, 'Alice'); assert.equal(comment.status, 'approved');
   assert.equal(comment.body, '<script>不会执行的纯文本</script>');
 });
-test('游客与其他用户看不到待审内容，作者可查看自己的待审内容', async () => {
+test('新评论立即对游客可见；管理员隐藏后仅作者可读', async () => {
+  assert.equal((await as('anon', null, 'select * from public.comments')).rows.length, 1);
+  await db.query("update public.comments set status='rejected' where id=$1", [comment.id]);
   assert.equal((await as('anon', null, 'select * from public.comments')).rows.length, 0);
   assert.equal((await as('authenticated', bob, 'select * from public.comments')).rows.length, 0);
   assert.equal((await as('authenticated', alice, 'select * from public.comments')).rows.length, 1);
@@ -53,7 +55,7 @@ test('前端无法伪造作者、审核状态或时间，也不能自己批准',
   await assert.rejects(as('authenticated', bob, `insert into public.comments(post_id,body,user_id) values ('welcome','伪造作者评论','${alice}')`), /permission denied/i);
   await assert.rejects(as('authenticated', alice, "update public.comments set status='approved'"), /permission denied/i);
 });
-test('审核后公开可读，结果中没有邮箱和密码字段', async () => {
+test('管理员可以恢复公开，结果中没有邮箱和密码字段', async () => {
   await db.query("update public.comments set status='approved' where id=$1", [comment.id]);
   const result = (await as('anon', null, 'select * from public.comments')).rows;
   assert.equal(result.length, 1); assert.equal(result[0].status, 'approved');

@@ -16,7 +16,7 @@ import { url } from '../lib/blog';
     </div>
     <div id="account-member" hidden>
       <div class="member-heading"><div><h2 id="member-name">读者</h2><p id="member-email" class="muted"></p></div><button type="button" id="signout" class="button secondary">退出登录</button></div>
-      <p class="form-help">这是用于文章交流的读者账户，不具备博客管理权限。评论提交后需经博主审核。</p>
+      <p class="form-help">这是用于文章交流的读者账户，不具备博客管理权限。邮箱验证后提交的评论会立即公开。</p>
       <a id="account-return" class="text-link" href={url('')}>返回阅读 →</a>
       <form id="nickname-form" class="stack-form"><h3>修改公开昵称</h3><label>新昵称<input name="nickname" required minlength="2" maxlength="40" autocomplete="nickname"/></label><button class="button secondary" type="submit">保存昵称</button><p class="form-help">只影响之后提交的评论，已提交的评论保留当时昵称。</p></form>
       <form id="password-form" class="stack-form"><h3>设置新密码</h3><label>新密码<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"/></label><label>再次输入新密码<input name="confirm" type="password" required minlength="12" maxlength="128" autocomplete="new-password"/></label><button class="button secondary" type="submit">保存新密码</button><p class="form-help">重设链接有效且处于登录状态时才能更新；服务可能要求重新验证身份。</p></form>
