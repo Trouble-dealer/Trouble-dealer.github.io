@@ -32,6 +32,8 @@ const config = {
   postsPerPage: 4,
   friends: /** @type {Friend[]} */ ([
     { name: 'Cyril Fan', url: 'https://cyril-fan.top/', description: 'Cosmic style', avatar: 'https://cyril-fan.top/avatar/avatar.png', rss: 'https://cyril-fan.top/rss.xml', kind: 'friend', color: '#e5e4f2' },
+    { name: 'VYS3N', url: 'https://VYS3N.github.io/', description: 'Sliver Bullet', avatar: 'https://VYS3N.github.io/images/avatar.webp', rss: 'https://VYS3N.github.io/rss.xml', kind: 'friend', color: '#dde6ef' },
+    { name: 'Roy Zhao', url: 'https://royzhao.cn/', description: '🏔️', avatar: 'https://royzhao.cn/avatar/avatar.png', rss: 'https://royzhao.cn/rss.xml', kind: 'friend', color: '#e1e9e4' },
     { name: 'Firefly', url: 'https://github.com/CuteLeaf/Firefly', description: '清新美观的 Astro 博客主题，也是本站的设计参考。', color: '#dce9e3' },
     { name: 'Hyde Blog', url: 'https://seasir.top/', description: '基于 Firefly 的二创博客，本站的另一处灵感来源。', color: '#e9e3d9' },
     { name: 'Astro', url: 'https://astro.build/', description: '本站使用的静态网站框架。', color: '#e3e0ed' },
