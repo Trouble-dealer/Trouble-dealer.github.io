@@ -34,7 +34,7 @@ const heroTitleBreak = siteConfig.hero.title.indexOf('，');
     {noindex && <meta name="robots" content="noindex,follow" />}
     <title>{pageTitle}</title>
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <link rel="icon" type={siteConfig.logo ? 'image/jpeg' : 'image/svg+xml'} href={url(siteConfig.logo || 'favicon.svg')} />
     <link rel="alternate" type="application/rss+xml" title={`${siteConfig.title} RSS`} href={url('rss.xml')} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
