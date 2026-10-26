@@ -59,7 +59,7 @@ const heroTitleBreak = siteConfig.hero.title.indexOf('，');
     <a class="skip-link" href="#main">跳到内容</a>
     <header class="site-header">
       <div class="header-inner">
-        <a class="brand" href={url('')} aria-label={`${siteConfig.title} 首页`}><span class="brand-mark"><Icon name="leaf" size={23}/></span><span>{siteConfig.title}<small>{siteConfig.subtitle}</small></span></a>
+        <a class="brand" href={url('')} aria-label={`${siteConfig.title} 首页`}><span class="brand-mark">{siteConfig.logo ? <img src={url(siteConfig.logo)} alt="" width="41" height="41"/> : <Icon name="leaf" size={23}/>}</span><span>{siteConfig.title}<small>{siteConfig.subtitle}</small></span></a>
         <nav class="desktop-nav" aria-label="主导航">{nav.map(item => <a href={url(item.path)} aria-current={(item.path ? path.startsWith(`/${item.path}`) : path === '/') ? 'page' : undefined}>{item.label}</a>)}</nav>
         <div class="header-tools">
           <a class="search-shortcut" href={url('search/')} aria-label="搜索文章"><Icon name="search" size={18}/><span>搜索文章</span><kbd>/</kbd></a>

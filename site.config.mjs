@@ -26,6 +26,7 @@ const config = {
     background: '#dce9e3',
   },
   avatar: '/images/elio-avatar.webp',
+  logo: '/images/brand-logo.jpg',
   github: 'https://github.com/Trouble-dealer',
   email: 'elio.ashling@gmail.com',
   postsPerPage: 4,

@@ -64,11 +64,12 @@ body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; 
 .brand { gap: 12px; font-size: 20px; letter-spacing: .7px; }
 .brand small { margin-top: 3px; font-size: 9px; letter-spacing: .6px; }
 .brand-mark {
-  width: 41px; height: 41px; border-radius: 14px;
+  width: 41px; height: 41px; border-radius: 14px; overflow: hidden;
   background: linear-gradient(145deg, var(--surface), var(--accent-soft));
   border: 1px solid var(--hairline);
   box-shadow: inset 0 1px 0 var(--panel-highlight), 0 4px 9px #24365306;
 }
+.brand-mark img { width: 100%; height: 100%; object-fit: cover; }
 .brand-mark svg { transform: rotate(-8deg); }
 .desktop-nav { gap: 4px; }
 .desktop-nav a { position: relative; padding: 9px 12px; font-size: 12px; border-radius: 8px; }
