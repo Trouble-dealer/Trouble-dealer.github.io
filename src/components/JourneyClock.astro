@@ -2,12 +2,14 @@
 import { siteConfig } from '../../site.config.mjs';
 import { elapsedSince } from '../lib/time';
 import { url, formatDate } from '../lib/blog';
+import QuietDoor from './QuietDoor.astro';
 interface Props { compact?: boolean; }
 const { compact = false } = Astro.props;
 const time = elapsedSince(siteConfig.journeyStartedAt);
 const startLabel = formatDate(new Date(siteConfig.journeyStartedAt));
 ---
 <section class:list={['card journey-clock', { compact }]} data-clock={siteConfig.journeyStartedAt} aria-label={`从 ${startLabel} 开始的纪念计时`}>
+  <button type="button" class="clock-quiet-entry" data-quiet-entry aria-label="打开" hidden></button>
   <div class="clock-top"><span class="eyebrow">EVERY SECOND, A NEW POSSIBILITY</span><span class="orbit-dot" aria-hidden="true"></span></div>
   <span class="clock-orbit" aria-hidden="true"></span>
   <h2>时间在走，探索继续。</h2>
@@ -15,3 +17,9 @@ const startLabel = formatDate(new Date(siteConfig.journeyStartedAt));
   <div class="clock-footer"><span>始于 {startLabel} · UTC+8</span><a href={url('observatory/')}>站点观测 ↗</a></div>
   <noscript><p class="form-help">当前为构建时计时快照，启用 JavaScript 后逐秒更新。</p></noscript>
 </section>
+<QuietDoor />
+<style>
+  .clock-quiet-entry{position:absolute!important;inset:0;z-index:2!important;border:0;background:transparent;cursor:pointer;border-radius:inherit;width:100%;height:100%}
+  .clock-quiet-entry:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+  .clock-footer a{position:relative;z-index:3}
+</style>

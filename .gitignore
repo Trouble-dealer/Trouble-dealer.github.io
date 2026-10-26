@@ -8,4 +8,7 @@ dist/
 .DS_Store
 Thumbs.db
 .qa/
+.private/
+# Personal source photo stays local; only the encrypted page is published.
+/235A6D067B5F4931EA53272CAAFD09E1.jpg
 supabase/.temp/
