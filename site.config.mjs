@@ -2,6 +2,7 @@
  * Elio 的博客配置。正式地址：jy.遮阳帽.space。
  * 中文域名写为 ASCII / Punycode，避免 DNS、证书和邮件跳转的兼容问题。
  */
+/** @typedef {{ name: string, url: string, description: string, color: string, kind?: 'friend' | 'reference', avatar?: string, rss?: string }} Friend */
 const config = {
   title: '具野 · Elio',
   subtitle: '让代码走进真实世界',
@@ -28,11 +29,12 @@ const config = {
   github: 'https://github.com/Trouble-dealer',
   email: 'elio.ashling@gmail.com',
   postsPerPage: 4,
-  friends: [
+  friends: /** @type {Friend[]} */ ([
+    { name: 'Cyril Fan', url: 'https://cyril-fan.top/', description: 'Cosmic style', avatar: 'https://cyril-fan.top/avatar/avatar.png', rss: 'https://cyril-fan.top/rss.xml', kind: 'friend', color: '#e5e4f2' },
     { name: 'Firefly', url: 'https://github.com/CuteLeaf/Firefly', description: '清新美观的 Astro 博客主题，也是本站的设计参考。', color: '#dce9e3' },
     { name: 'Hyde Blog', url: 'https://seasir.top/', description: '基于 Firefly 的二创博客，本站的另一处灵感来源。', color: '#e9e3d9' },
     { name: 'Astro', url: 'https://astro.build/', description: '本站使用的静态网站框架。', color: '#e3e0ed' },
-  ],
+  ]),
 };
 
 // GitHub Actions 在构建时自动推导 github.io 地址；自定义域名优先在上面填写。
