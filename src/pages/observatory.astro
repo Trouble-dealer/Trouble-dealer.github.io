@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import JourneyClock from '../components/JourneyClock.astro';
+import Icon from '../components/Icon.astro';
+import { siteConfig } from '../../site.config.mjs';
+import { communityConfig } from '../../community.config.mjs';
+import { getPosts, taxonomy, url, formatDate } from '../lib/blog';
+import { elapsedDays } from '../lib/time';
+const posts = await getPosts();
+const launchedLabel = formatDate(new Date(siteConfig.launchedAt));
+const journeyLabel = formatDate(new Date(siteConfig.journeyStartedAt));
+---
+<BaseLayout title="站点观测" description="具野的时间、内容与真实访问统计。"><header class="page-intro card observatory-intro"><p class="page-index">JUYE / OBSERVATORY / 01</p><p class="eyebrow">A SMALL SITE, STILL GROWING</p><h1>每一次来访，都有回响。</h1><p>在这里看时间流过，也看这个小站慢慢长大。</p></header>
+  <JourneyClock/>
+  <section class="metrics-grid" aria-label="站点统计">
+    <article class="card metric-card"><p class="metric-label">建站已满 <span class="metric-index">01 / DAYS</span></p><p class="metric-value"><span data-elapsed-days={siteConfig.launchedAt}>{elapsedDays(siteConfig.launchedAt)}</span><small class="inline-unit">天</small></p><small>上线于 {launchedLabel} · 北京时间</small></article>
+    <article class="card metric-card"><p class="metric-label">公开文章 <span class="metric-index">02 / NOTES</span></p><p class="metric-value">{posts.length}<small class="inline-unit">篇</small></p><small>{taxonomy(posts, 'category').length} 个分类 · {taxonomy(posts, 'tags').length} 个标签</small></article>
+    <article class="card metric-card"><p class="metric-label">页面访问量 <span class="metric-index">03 / VIEWS</span></p><p class="metric-value" data-stat="pageviews">—</p><small>同浏览器同页面，30 分钟内刷新去重</small></article>
+    <article class="card metric-card"><p class="metric-label">访问浏览器 <span class="metric-index">04 / BROWSERS</span></p><p class="metric-value" data-stat="browsers">—</p><small>按随机浏览器标识去重，并非精确人数</small></article>
+  </section>
+  <div class="statistics-actions"><p class="form-status" id="statistics-status" role="status" aria-live="polite">{communityConfig.statisticsReady ? '正在读取访问数据…' : '访问统计暂未启用，启用后从实际记录开始累计。'}</p><button class="button secondary" id="statistics-refresh" type="button" hidden><Icon name="clock" size={14}/>刷新数据</button></div>
+  <section class="card statistics-details"><h2>数字背后的说明</h2><p>纪念计时起点为 {journeyLabel}；建站天数从 {launchedLabel} 起计算。两者按已完整经过的时间统计，不把纪念起点当作网站上线日期。</p><p>访问数据从统计功能启用时开始，无法恢复此前访问。开始日期：<span data-stat="started">尚未启用</span>。计数仅供观察站点活动，不能代表真实独立人数。</p><details class="stats-disclosure"><summary>如何计数，以及你可以控制什么</summary><p>本站为同意参与统计的浏览器生成随机标识；不把它与登录账号关联，不记录 IP、搜索词或网址查询参数。同一浏览器同一页面 30 分钟内重复刷新只计一次。更换设备、清理存储或无痕访问可能产生新标识；自动化请求也可能影响数值。</p><p>统计可随时关闭。关闭后不再提交后续访问，但不会删除已有聚合计数。本地预览不会上报访问。更多信息见<a href={url('privacy/')} class="text-link">隐私说明 →</a>。</p></details><label class="stats-pref"><input id="statistics-consent" type="checkbox"/>允许此浏览器参与匿名访问统计</label><p class="form-help" id="statistics-preference-status" role="status"></p></section>
+</BaseLayout>
+<style>.inline-unit{display:inline!important;font-size:12px!important;margin-left:8px;font-weight:400;letter-spacing:0}</style>

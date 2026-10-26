@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MarkdownTools from '../components/MarkdownTools.astro';
+import { communityConfig } from '../../community.config.mjs';
+import { url } from '../lib/blog';
+---
+<BaseLayout title="留言聊天区" description="给具野留一句话，与同路人聊聊技术和生活。"><header class="page-intro card lounge-intro"><p class="page-index">JUYE / OPEN CHANNEL / 02</p><p class="eyebrow">A MESSAGE IS A BEGINNING</p><h1>把想说的，留在这里。</h1><p>聊技术，也聊日常。登录后就能加入，消息向所有访客公开。</p><span class="channel-badge"># GENERAL · 公共交流频道</span></header>
+  <section class="card lounge-card" id="lounge-app" data-enabled={communityConfig.loungeReady}>
+    <div class="lounge-toolbar"><div><h2>留言与聊天</h2><span class="connection-status" id="lounge-connection" data-state="idle">{communityConfig.loungeReady ? '正在连接…' : '尚未开放'}</span></div><div class="lounge-actions"><button id="lounge-latest" class="button secondary" type="button" hidden>回到最新</button><button id="lounge-refresh" class="button secondary" type="button" hidden>刷新</button></div></div>
+    {!communityConfig.loungeReady ? <div class="backend-pending"><h2>交流频道准备中</h2><p>留言聊天区将在准备完成后开放。现在可以在下方试写 Markdown，体验新的输入格式。</p></div> : <>
+      <p class="form-status" id="lounge-status" role="status" aria-live="polite">正在读取消息…</p>
+      <button class="button secondary lounge-more" id="lounge-older" type="button" hidden>查看更早的消息</button>
+      <div class="lounge-messages" id="lounge-messages" aria-label="聊天消息"></div>
+      <div class="lounge-editor"><p id="lounge-login" class="lounge-login" hidden><a href={`${url('account/')}?next=${encodeURIComponent(url('lounge/'))}`}>登录或注册</a>，与大家聊一聊。</p><form class="stack-form" id="lounge-form" hidden><div class="replying-to" id="lounge-reply" hidden><span></span><button type="button" id="lounge-cancel-reply">取消回复</button></div><label for="lounge-body">写一条消息</label><textarea id="lounge-body" name="body" rows="5" required minlength="1" maxlength="4000" placeholder="分享一个想法，或用 Markdown 贴一段代码…"></textarea><MarkdownTools/><div class="lounge-submit-row"><small><span id="lounge-length">0</span> / 4000 · <kbd>Ctrl</kbd> + <kbd>Enter</kbd> 发送</small><button type="submit" class="button">发送消息 ↗</button></div><p class="form-help">验证邮箱后可发送，3 秒一条、每小时最多 60 条。支持 Markdown；HTML、图片与嵌入内容会被过滤。</p></form></div>
+    </>}
+    <noscript><p class="form-help">留言实时显示与发送需要启用 JavaScript。</p></noscript>
+  </section>
+  <details class="card statistics-details markdown-playground"><summary>Markdown 试写区 · 仅预览，不发送</summary><form id="markdown-playground" class="stack-form"><label for="markdown-sandbox">试写一段 Markdown</label><textarea id="markdown-sandbox" maxlength="4000" rows="6" placeholder="**你好，具野。**&#10;&#10;> 每个想法，都值得留下。"></textarea><MarkdownTools/><p class="form-help">这里只在当前浏览器预览，不存储、不发布。支持粗体、斜体、引用、列表、代码、表格和链接。</p></form></details>
+</BaseLayout>
+<script>import '../scripts/lounge';</script>
+<style>.markdown-playground{margin-top:20px}.markdown-playground>summary{cursor:pointer;color:var(--accent);font-size:12px}</style>

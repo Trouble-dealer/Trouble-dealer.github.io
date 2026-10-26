@@ -1,0 +1,17 @@
+---
+import { siteConfig } from '../../site.config.mjs';
+import { elapsedSince } from '../lib/time';
+import { url, formatDate } from '../lib/blog';
+interface Props { compact?: boolean; }
+const { compact = false } = Astro.props;
+const time = elapsedSince(siteConfig.journeyStartedAt);
+const startLabel = formatDate(new Date(siteConfig.journeyStartedAt));
+---
+<section class:list={['card journey-clock', { compact }]} data-clock={siteConfig.journeyStartedAt} aria-label={`从 ${startLabel} 开始的纪念计时`}>
+  <div class="clock-top"><span class="eyebrow">EVERY SECOND, A NEW POSSIBILITY</span><span class="orbit-dot" aria-hidden="true"></span></div>
+  <span class="clock-orbit" aria-hidden="true"></span>
+  <h2>时间在走，探索继续。</h2>
+  <div class="clock-display" role="timer" aria-live="off"><span class="clock-days"><strong data-days>{time.days}</strong><small>天</small></span><span class="clock-digits"><b data-hours>{String(time.hours).padStart(2, '0')}</b><i>:</i><b data-minutes>{String(time.minutes).padStart(2, '0')}</b><i>:</i><b data-seconds>{String(time.seconds).padStart(2, '0')}</b></span></div>
+  <div class="clock-footer"><span>始于 {startLabel} · UTC+8</span><a href={url('observatory/')}>站点观测 ↗</a></div>
+  <noscript><p class="form-help">当前为构建时计时快照，启用 JavaScript 后逐秒更新。</p></noscript>
+</section>

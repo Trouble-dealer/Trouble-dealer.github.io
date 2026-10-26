@@ -14,6 +14,9 @@ const config = {
   base: '/',
   language: 'zh-CN',
   timezone: 'Asia/Shanghai',
+  // 用户指定的纪念计时起点；建站上线日另行统计。
+  journeyStartedAt: '2025-03-26T00:00:00+08:00',
+  launchedAt: '2026-10-25T00:00:00+08:00',
   hero: {
     eyebrow: 'SOFTWARE · EMBEDDED SYSTEMS · EMBODIED AI',
     title: '让代码，走进真实世界。',

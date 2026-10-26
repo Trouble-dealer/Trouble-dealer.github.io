@@ -1,5 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 import { backend, backendError } from '../lib/backend';
+import { markdown, attachMarkdownEditor } from './markdown-editor';
 type Comment = { id: string; post_id: string; user_id: string; author_name: string; body: string; status: string; created_at: string };
 const app = document.querySelector<HTMLElement>('#comments');
 if (app && backend) {
@@ -9,6 +10,7 @@ if (app && backend) {
   const more = app.querySelector<HTMLButtonElement>('#comments-more')!;
   const refresh = app.querySelector<HTMLButtonElement>('#comments-refresh')!;
   const form = app.querySelector<HTMLFormElement>('#comment-form');
+  if (form) attachMarkdownEditor(form);
   let user: User | null = null;
   let loading = false;
   let submitting = false;
@@ -31,7 +33,7 @@ if (app && backend) {
       const time = document.createElement('time'); time.dateTime = item.created_at; time.textContent = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Shanghai' }).format(new Date(item.created_at));
       header.append(author, time);
       if (item.status !== 'approved') { const badge = document.createElement('span'); badge.className = 'comment-badge'; badge.textContent = item.status === 'pending' ? '待审核 · 仅自己可见' : '未通过 · 仅自己可见'; header.append(badge); }
-      const body = document.createElement('p'); body.className = 'comment-body'; body.textContent = item.body;
+      const body = document.createElement('div'); body.className = 'comment-body message-markdown'; body.innerHTML = markdown(item.body);
       article.append(header, body);
       if (user?.id === item.user_id && app!.dataset.auth === 'true') {
         const button = document.createElement('button'); button.type = 'button'; button.className = 'comment-delete'; button.textContent = '删除我的评论';

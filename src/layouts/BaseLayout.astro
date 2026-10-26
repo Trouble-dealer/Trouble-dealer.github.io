@@ -1,9 +1,12 @@
 ---
 import '../styles/global.css';
+import '../styles/upgrade.css';
+import '../styles/editorial.css';
 import { siteConfig } from '../../site.config.mjs';
 import { absolute, categoryUrl, getPosts, taxonomy, tagUrl, url, yearOf } from '../lib/blog';
 import Icon from '../components/Icon.astro';
 import { authEnabled } from '../lib/backend';
+import JourneyClock from '../components/JourneyClock.astro';
 interface Props {
   title?: string; description?: string; hero?: boolean; noindex?: boolean;
   headings?: { depth: number; slug: string; text: string }[];
@@ -15,12 +18,13 @@ const categories = taxonomy(posts, 'category');
 const tags = taxonomy(posts, 'tags');
 const years = [...new Set(posts.map(p => yearOf(p.data.published)))];
 const path = decodeURI(Astro.url.pathname).replace(siteConfig.base.replace(/\/$/, ''), '');
-const nav = [{ label: '首页', path: '' }, { label: '归档', path: 'archive/' }, { label: '分类', path: 'categories/' }, { label: '友链', path: 'friends/' }, { label: '关于', path: 'about/' }, ...(authEnabled ? [{ label: '账户', path: 'account/' }] : [])];
+const nav = [{ label: '首页', path: '' }, { label: '归档', path: 'archive/' }, { label: '分类', path: 'categories/' }, { label: '留言', path: 'lounge/' }, { label: '观测', path: 'observatory/' }, { label: '友链', path: 'friends/' }, { label: '关于', path: 'about/' }, ...(authEnabled ? [{ label: '账户', path: 'account/' }] : [])];
 const pageTitle = title ? `${title} · ${siteConfig.title}` : `${siteConfig.title} · ${siteConfig.subtitle}`;
 const canonical = absolute(Astro.url.pathname.replace(siteConfig.base, ''));
+const heroTitleBreak = siteConfig.hero.title.indexOf('，');
 ---
 <!doctype html>
-<html lang={siteConfig.language}>
+<html lang={siteConfig.language} data-site-origin={new URL(siteConfig.url).origin}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,12 +49,13 @@ const canonical = absolute(Astro.url.pathname.replace(siteConfig.base, ''));
         const prefs = JSON.parse(localStorage.getItem('qiguang-prefs') || '{}');
         const mode = ['light', 'dark', 'system'].includes(prefs.theme) ? prefs.theme : 'system';
         document.documentElement.dataset.theme = mode === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode;
-        document.documentElement.dataset.accent = ['sage', 'blue', 'rose'].includes(prefs.accent) ? prefs.accent : 'sage';
+        document.documentElement.dataset.accent = ['sage', 'blue', 'rose', 'violet'].includes(prefs.accent) ? prefs.accent : 'blue';
+        document.documentElement.dataset.skin = ['silver', 'mono', 'garden'].includes(prefs.skin) ? prefs.skin : 'silver';
         if (prefs.font >= 15 && prefs.font <= 20) document.documentElement.style.setProperty('--reading-size', prefs.font + 'px');
-      } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+      } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; document.documentElement.dataset.skin = 'silver'; }
     </script>
   </head>
-  <body>
+  <body class:list={{ 'is-home': hero }}>
     <a class="skip-link" href="#main">跳到内容</a>
     <header class="site-header">
       <div class="header-inner">
@@ -63,11 +68,14 @@ const canonical = absolute(Astro.url.pathname.replace(siteConfig.base, ''));
           <button class="icon-button mobile-menu-button" id="menu-toggle" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-nav" hidden><Icon name="menu" size={21}/></button>
         </div>
       </div>
-      <nav id="mobile-nav" class="mobile-nav" aria-label="移动端导航">{nav.map(item => <a href={url(item.path)}>{item.label}</a>)}<a href={url('search/')}>搜索</a></nav>
+      <nav id="mobile-nav" class="mobile-nav" aria-label="移动端导航">{nav.map(item => <a href={url(item.path)} aria-current={(item.path ? path.startsWith(`/${item.path}`) : path === '/') ? 'page' : undefined}>{item.label}</a>)}<a href={url('search/')}>搜索</a></nav>
     </header>
     {hero && <section class="hero" style={`background-color:${siteConfig.hero.background}`}>
       {siteConfig.hero.image && <img src={url(siteConfig.hero.image)} alt="" class="hero-image" fetchpriority="high" />}
-      <div class="hero-inner"><p class="eyebrow">{siteConfig.hero.eyebrow}</p><h1>{siteConfig.hero.title}</h1><p class="hero-description">{siteConfig.hero.description}</p><span class="hero-bottom">{siteConfig.title.toUpperCase()} <span> / </span> PERSONAL JOURNAL</span></div>
+      <div class="hero-inner">
+        <div class="hero-copy"><p class="eyebrow">{siteConfig.hero.eyebrow}</p><h1>{heroTitleBreak >= 0 ? <><span class="hero-title-clause">{siteConfig.hero.title.slice(0,heroTitleBreak+1)}</span><span class="hero-title-clause">{siteConfig.hero.title.slice(heroTitleBreak+1)}</span></> : siteConfig.hero.title}</h1><p class="hero-description">{siteConfig.hero.description}</p><div class="hero-bottom"><span class="hero-signature">{siteConfig.author}<i aria-hidden="true"> / </i>个人探索手记</span><a href={url('about/')}>认识博主 <Icon name="arrow" size={15}/></a></div></div>
+        <div class="hero-identity" aria-hidden="true"><div class="identity-orbit"><span class="orbit-label label-software">软件工程</span><span class="orbit-label label-embedded">嵌入式</span><span class="orbit-label label-embodied">具身智能</span><div class="identity-core"><span>JY<span class="monogram-dot">.</span></span><small>具 野</small></div><span class="identity-satellite"></span></div><span class="identity-caption">THOUGHTS INTO THE REAL WORLD</span></div>
+      </div>
     </section>}
     <div class:list={['site-grid', { 'with-hero': hero }]}>
       <aside class="left-sidebar" aria-label="博客信息">
@@ -78,6 +86,7 @@ const canonical = absolute(Astro.url.pathname.replace(siteConfig.base, ''));
           <div class="profile-stats"><a href={url('archive/')}><strong>{posts.length}</strong><span>文章</span></a><a href={url('categories/')}><strong>{categories.length}</strong><span>分类</span></a><a href={url('tags/')}><strong>{tags.length}</strong><span>标签</span></a></div>
           <div class="social-links">{siteConfig.github && <a href={siteConfig.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"><Icon name="github" size={19}/></a>}{siteConfig.email && <a href={`mailto:${siteConfig.email}`} aria-label="发送邮件"><Icon name="mail" size={19}/></a>}<a href={url('rss.xml')} aria-label="RSS 订阅" title="RSS 订阅"><Icon name="rss" size={18}/></a><a href={url('about/')} class="profile-more">认识一下 <Icon name="arrow" size={15}/></a></div>
         </section>
+        <button type="button" class="card theme-indicator" data-open-settings hidden aria-label="打开外观设置"><span class="status-light"></span><span data-theme-label>银雾 · 跟随系统</span><small>外观</small><Icon name="settings" size={13}/></button>
         <section class="card sidebar-card"><h2><Icon name="folder" size={17}/>文章分类<a href={url('categories/')} aria-label="查看所有分类"><Icon name="arrow" size={15}/></a></h2><div class="category-list">{categories.map(([name, count]) => <a href={categoryUrl(name)}><span>{name}</span><span class="count">{count}</span></a>)}</div></section>
         <section class="card sidebar-card tag-cloud"><h2><Icon name="tag" size={17}/>标签漫游</h2><div class="tag-row">{tags.map(([name, count]) => <a href={tagUrl(name)} aria-label={`${name}，${count} 篇文章`}>{name}</a>)}</div></section>
       </aside>
@@ -91,12 +100,15 @@ const canonical = absolute(Astro.url.pathname.replace(siteConfig.base, ''));
         <div class="aside-caption">WORDS TAKE ROOT.<br/>LIFE FINDS ITS LIGHT.</div>
       </aside>
     </div>
+    {hero && <div class="home-bottom"><JourneyClock/><a class="card lounge-invitation" href={url('lounge/')}><span class="eyebrow">OPEN CHANNEL / PUBLIC LOUNGE</span><h2>留一句话，认识一个同路人。</h2><p>聊聊代码、嵌入式、具身智能，或今天的小发现。</p><span class="invitation-action">进入留言聊天区 <Icon name="arrow" size={18}/></span></a></div>}
     <footer class="site-footer"><div><a class="footer-brand" href={url('')}><Icon name="leaf" size={17}/>{siteConfig.title}</a><p>© {new Date().getFullYear()} {siteConfig.author} · {siteConfig.subtitle}</p></div><div><p>Built with <a href="https://astro.build/" target="_blank" rel="noopener noreferrer">Astro</a> · Hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a></p><p>设计参考 <a href="https://github.com/CuteLeaf/Firefly" target="_blank" rel="noopener noreferrer">Firefly</a> / <a href="https://seasir.top/" target="_blank" rel="noopener noreferrer">Hyde Blog</a> · <a href={url('rss.xml')}>RSS</a> · <a href={url('sitemap.xml')}>站点地图</a> · <a href={url('privacy/')}>隐私说明</a></p></div></footer>
     <button class="back-to-top icon-button" id="back-to-top" aria-label="返回顶部" hidden><Icon name="up" size={23}/></button>
-    <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="settings-title">阅读偏好</h2></div><button class="icon-button" id="settings-close" aria-label="关闭阅读设置"><Icon name="close"/></button></div><p class="settings-description">设置保存在当前浏览器，下次来访依然生效。</p><fieldset><legend>外观模式</legend><div class="segmented"><label><input type="radio" name="theme" value="light"/>浅色</label><label><input type="radio" name="theme" value="dark"/>深色</label><label><input type="radio" name="theme" value="system"/>跟随系统</label></div></fieldset><fieldset><legend>主题颜色</legend><div class="accent-options"><label><input type="radio" name="accent" value="sage"/>苔绿</label><label><input type="radio" name="accent" value="blue"/>雾蓝</label><label><input type="radio" name="accent" value="rose"/>浅莓</label></div></fieldset><label class="font-setting" for="reading-font">文章字号 <output id="font-output" for="reading-font">17px</output></label><input id="reading-font" type="range" min="15" max="20" step="1" value="17"/><button class="button secondary reset-settings" id="reset-settings">恢复默认设置</button></dialog>
+    <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="settings-title">阅读与外观</h2></div><button class="icon-button" id="settings-close" aria-label="关闭阅读设置"><Icon name="close"/></button></div><p class="settings-description">设置保存在当前浏览器，下次来访依然生效。</p><p class="settings-current"><span class="status-light"></span><span data-theme-label>银雾 · 跟随系统</span></p><fieldset><legend>视觉主题</legend><div class="skin-options"><label><input type="radio" name="skin" value="silver"/><span class="skin-swatch swatch-silver"></span><b>银雾</b><small>冷银 · 通透</small></label><label><input type="radio" name="skin" value="mono"/><span class="skin-swatch swatch-mono"></span><b>黑白</b><small>克制 · 纯粹</small></label><label><input type="radio" name="skin" value="garden"/><span class="skin-swatch swatch-garden"></span><b>原野</b><small>柔和 · 自然</small></label></div></fieldset><fieldset><legend>外观模式</legend><div class="segmented"><label><input type="radio" name="theme" value="light"/>浅色</label><label><input type="radio" name="theme" value="dark"/>深色</label><label><input type="radio" name="theme" value="system"/>跟随系统</label></div></fieldset><fieldset><legend>点缀颜色 <small>黑白主题使用中性色</small></legend><div class="accent-options"><label><input type="radio" name="accent" value="sage"/>苔绿</label><label><input type="radio" name="accent" value="blue"/>冰蓝</label><label><input type="radio" name="accent" value="rose"/>浅莓</label><label><input type="radio" name="accent" value="violet"/>极光紫</label></div></fieldset><label class="font-setting" for="reading-font">文章字号 <output id="font-output" for="reading-font">17px</output></label><input id="reading-font" type="range" min="15" max="20" step="1" value="17"/><label class="effect-setting"><span>点击星火<small>轻触页面时绽放；系统减少动态效果时自动停用</small></span><input id="fireworks-enabled" type="checkbox" checked/></label><button class="button secondary reset-settings" id="reset-settings">恢复默认设置</button></dialog>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
     <script>
       import '../scripts/site';
+      import '../scripts/ambience';
+      import '../scripts/statistics';
     </script>
   </body>
 </html>

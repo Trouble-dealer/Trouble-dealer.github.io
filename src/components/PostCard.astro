@@ -14,6 +14,6 @@ const { post, index = 0 } = Astro.props;
     <div class="post-bottom"><div class="tag-row">{post.data.tags.slice(0, 3).map(tag => <a href={tagUrl(tag)}>#{tag}</a>)}</div><a class="read-link" href={postUrl(post)} aria-label={`阅读：${post.data.title}`}><Icon name="arrow" size={19}/></a></div>
   </div>
   <a class:list={['post-cover', `tone-${post.data.color}`]} href={postUrl(post)} aria-label={`阅读：${post.data.title}`} tabindex="-1" aria-hidden="true">
-    {post.data.cover ? <img src={url(post.data.cover)} alt="" loading="lazy" width="320" height="300" /> : <span class="cover-word">{post.data.category}<span>{String(index + 1).padStart(2, '0')} / JOURNAL</span></span>}
+    {post.data.cover ? <img src={url(post.data.cover)} alt="" loading="lazy" width="320" height="300" /> : <><span class="cover-index">{String(index + 1).padStart(2, '0')}</span><span class="cover-geometry"></span><span class="cover-word">{post.data.category}<span>FIELD NOTES / ELIO</span></span></>}
   </a>
 </article>

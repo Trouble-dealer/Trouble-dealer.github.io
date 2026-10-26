@@ -10,7 +10,7 @@ export const backend = backendConfig.configured ? createClient(backendConfig.url
   auth: { flowType: 'pkce', detectSessionInUrl: false, persistSession: true, autoRefreshToken: true },
 }) : null;
 
-export function backendError(error: { message: string; code?: string; status?: number }): string {
+export function backendError(error: { message: string; code?: string; status?: number }, context: 'comment' | 'lounge' = 'comment'): string {
   const code = error.code ?? '';
   if (code === 'invalid_credentials') return '邮箱或密码不正确，请检查后重试。';
   if (code === 'email_not_confirmed') return '请先打开注册验证邮件，完成邮箱验证后再登录。';
@@ -19,11 +19,12 @@ export function backendError(error: { message: string; code?: string; status?: n
   if (code === 'over_email_send_rate_limit' || error.status === 429) return '操作过于频繁，请稍后重试。';
   if (code === 'otp_expired' || code === 'flow_state_expired' || code === 'flow_state_not_found') return '链接已过期或不是在发起请求的浏览器中打开，请重新发送邮件。';
   if (error.message.includes('comment_rate_limit')) return '评论间隔至少 30 秒，每小时最多提交 10 条。请稍后重试。';
-  if (error.message.includes('verified_email_required')) return '请先验证邮箱，再提交评论。';
+  if (error.message.includes('lounge_rate_limit')) return '请留 3 秒交流间隔，每小时最多发送 60 条消息。';
+  if (error.message.includes('verified_email_required')) return context === 'lounge' ? '请先验证邮箱，再发送消息。' : '请先验证邮箱，再提交评论。';
   if (error.message.includes('comment_name_required')) return '请在账户页设置 2～40 字的公开昵称。';
-  if (code === '23503') return '这篇文章的评论尚未开放，请稍后再试。';
-  if (code === '23514') return '请检查评论长度，正文需要 3～2000 字。';
+  if (code === '23503') return context === 'lounge' ? '回复的消息已不存在，请取消回复后重新发送。' : '这篇文章的评论尚未开放，请稍后再试。';
+  if (code === '23514') return context === 'lounge' ? '消息需要 1～4000 字，请检查内容与公开昵称。' : '请检查评论长度，正文需要 3～2000 字。';
   if (code === '42501') return '没有执行这项操作的权限，请确认登录状态。';
-  if (code === '42P01' || code === 'PGRST205') return '评论服务尚未完成初始化，请联系博主。';
+  if (code === '42P01' || code === 'PGRST205') return context === 'lounge' ? '聊天服务尚未完成初始化，请稍后再来。' : '评论服务尚未完成初始化，请联系博主。';
   return '请求未完成，请检查网络后重试；持续失败时可联系博主。';
 }

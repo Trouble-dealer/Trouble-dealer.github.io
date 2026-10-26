@@ -4,7 +4,7 @@ import { siteConfig } from '../../site.config.mjs';
 const escape = (s: string) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 export const GET: APIRoute = async () => {
   const posts = await getPosts();
-  const fixed = ['', 'archive/', 'categories/', 'tags/', 'about/', 'friends/', 'privacy/'];
+  const fixed = ['', 'archive/', 'categories/', 'tags/', 'about/', 'friends/', 'privacy/', 'lounge/', 'observatory/'];
   const pages = [
     ...fixed.map(path => ({ path, updated: undefined as Date | undefined })),
     ...Array.from({ length: Math.max(0, Math.ceil(posts.length / siteConfig.postsPerPage) - 1) }, (_, i) => ({ path: `page/${i + 2}/`, updated: undefined })),
