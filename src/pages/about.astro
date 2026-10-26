@@ -4,4 +4,30 @@ import Icon from '../components/Icon.astro';
 import { siteConfig } from '../../site.config.mjs';
 import { url } from '../lib/blog';
 ---
-<BaseLayout title="关于 Elio"><header class="page-intro card"><p class="eyebrow">HELLO, NICE TO MEET YOU</p><h1>关于 Elio</h1><p>在代码与真实世界之间，留下一些探索的足迹。</p></header><section class="card content-card"><div class="about-lead"><span class="about-avatar"><Icon name="leaf" size={30}/></span><div><h2>你好，我是{siteConfig.author}。</h2><p>{siteConfig.subtitle}</p></div></div><div class="prose"><p>{siteConfig.introduction}</p><p>「具野」里的“具”，来自具身智能；“野”，是一片可以动手实验、不断生长的地方。我希望把零散的学习整理成可复用的经验，也为普通的日子留下记录。</p><h2>你会在这里看到</h2><ul><li>技术笔记：软件工程、嵌入式系统与具身智能方向的学习和实践。</li><li>生活随笔：探索之外，记录日常和思考。</li><li>阅读收藏：整理值得继续追问的问题、书籍和资料。</li></ul><h2>保持联系</h2><p>欢迎通过邮件或 GitHub 与我交流，也可以通过 RSS 订阅新的文章。</p></div><div class="about-links"><a href={url('rss.xml')} class="button"><Icon name="rss" size={16}/>RSS 订阅</a><a class="button secondary" href={siteConfig.github} target="_blank" rel="noopener noreferrer"><Icon name="github" size={16}/>GitHub</a><a class="button secondary" href={`mailto:${siteConfig.email}`}><Icon name="mail" size={16}/>给我写信</a></div></section></BaseLayout>
+<BaseLayout title="关于 Elio">
+  <header class="page-intro card"><p class="eyebrow">HELLO, NICE TO MEET YOU</p><h1>关于 Elio</h1><p>在代码与真实世界之间，留下一些探索的足迹。</p></header>
+  <section class="card content-card">
+    <div class="about-lead"><span class="about-avatar">{siteConfig.avatar ? <img src={url(siteConfig.avatar)} alt={siteConfig.author} width="64" height="64"/> : <Icon name="leaf" size={30}/>}</span><div><h2>你好，我是{siteConfig.author}。</h2><p>UESTC 大三在读 · 王同学</p></div></div>
+    <div class="prose"><p>{siteConfig.introduction}</p><p>「具野」里的“具”，来自具身智能；“野”，是一片可以动手实验、不断生长的地方。我希望把零散的学习整理成可复用的经验，也为普通的日子留下记录。</p><h2>你会在这里看到</h2><ul><li>技术笔记：软件工程、嵌入式系统与具身智能方向的学习和实践。</li><li>生活随笔：探索之外，记录日常和思考。</li><li>阅读收藏：整理值得继续追问的问题、书籍和资料。</li></ul><h2>保持联系</h2><p>欢迎通过邮件或 GitHub 与我交流，也可以通过 RSS 订阅新的文章。</p></div>
+    {siteConfig.email && <div class="contact-email" id="contact-email" tabindex="-1" aria-label="电子邮箱"><div><span class="contact-caption"><Icon name="mail" size={15}/>电子邮箱</span><p class="contact-address">{siteConfig.email}</p><p class="contact-help">欢迎聊聊技术、项目，或者交换友链。</p></div><button type="button" class="button secondary" id="copy-email" data-email={siteConfig.email} hidden><Icon name="copy" size={14}/>复制邮箱</button><p id="email-copy-status" class="contact-status" role="status" aria-live="polite"></p></div>}
+    <div class="about-links"><a href={url('rss.xml')} class="button"><Icon name="rss" size={16}/>RSS 订阅</a><a class="button secondary" href={siteConfig.github} target="_blank" rel="noopener noreferrer"><Icon name="github" size={16}/>GitHub</a></div>
+  </section>
+</BaseLayout>
+<script>
+  const copy = document.querySelector<HTMLButtonElement>('#copy-email');
+  const status = document.querySelector<HTMLElement>('#email-copy-status');
+  if (copy && status) {
+    copy.hidden = false;
+    copy.addEventListener('click', async () => {
+      copy.disabled = true;
+      try { await navigator.clipboard.writeText(copy.dataset.email!); status.textContent = '邮箱已复制，可以粘贴到你的邮件应用。'; }
+      catch { status.textContent = '未能自动复制，请选中上方邮箱地址手动复制。'; }
+      finally { copy.disabled = false; }
+    });
+  }
+</script>
+<style>
+  .about-avatar{overflow:hidden;flex-shrink:0}.about-avatar img{width:100%;height:100%;object-fit:cover}
+  .contact-email{scroll-margin-top:110px;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:23px;margin-top:23px;border:1px solid var(--line);border-radius:13px;background:var(--surface-alt)}.contact-email:target{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}.contact-caption{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}.contact-address{font-size:17px;margin-top:10px;letter-spacing:.2px;overflow-wrap:anywhere;user-select:all}.contact-help{font-size:11px;color:var(--muted);line-height:1.9;margin-top:7px}.contact-email .button{font-size:11px}.contact-status{flex-basis:100%;font-size:11px;line-height:1.8;color:var(--accent)}.contact-status:empty{display:none}
+  @media(max-width:460px){.contact-email{padding:20px;align-items:flex-start}.contact-address{font-size:15px}.contact-help{font-size:10px}}
+</style>
