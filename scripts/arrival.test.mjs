@@ -3,13 +3,17 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 import {JSDOM} from 'jsdom';
-import {waveProgress} from '../src/lib/arrival.ts';
-test('海浪先上岸后退回，五秒后显字完成并开放进入',()=>{
-  assert.equal(waveProgress(0).writing,0);assert.equal(waveProgress(0).ready,false);
-  assert.ok(waveProgress(2.25).shore>waveProgress(0).shore);
-  assert.ok(waveProgress(4).shore<waveProgress(2.25).shore);
-  assert.equal(waveProgress(4.9).ready,false);assert.equal(waveProgress(5).ready,true);assert.equal(waveProgress(5).writing,1);
-  assert.equal(waveProgress(100).shore,waveProgress(5).shore);
+import {videoProgress} from '../src/lib/arrival.ts';
+test('文字在实际视频结尾前淡入，播放结束才开放进入，未知时长使用安全回退',()=>{
+  assert.deepEqual(videoProgress(0,5.055),{writing:false,ready:false});
+  assert.equal(videoProgress(3.7,5.055).writing,true);
+  assert.equal(videoProgress(5,5.055).ready,false);
+  assert.equal(videoProgress(5.055,5.055).ready,true);
+  assert.equal(videoProgress(8.5,10).writing,false);
+  assert.equal(videoProgress(9,10).writing,true);
+  assert.equal(videoProgress(10,10).ready,true);
+  assert.deepEqual(videoProgress(0,NaN),{writing:false,ready:false});
+  assert.equal(videoProgress(5.055,Infinity).ready,true);
 });
 const source=stripTypeScriptTypes(await readFile(new URL('../src/scripts/site.ts',import.meta.url),'utf8'));
 function page(skin){
