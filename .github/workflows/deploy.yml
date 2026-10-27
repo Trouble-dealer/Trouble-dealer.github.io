@@ -56,3 +56,7 @@ jobs:
       - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Checkout publication manifest
+        uses: actions/checkout@v4
+      - name: Synchronize article comments
+        run: node scripts/sync-comments.mjs

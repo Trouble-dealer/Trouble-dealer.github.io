@@ -1,0 +1,20 @@
+---
+import note from '../data/daily-note.json';
+const text=note.text.trim();
+---
+<aside class="daily-note" aria-label="Elio 的便利贴">
+  <span class="note-tape" aria-hidden="true"></span>
+  <div class="note-heading"><span>几句话 / ELIO'S NOTE</span>{note.date && <time datetime={note.date}>{note.date.replaceAll('-','.')}</time>}</div>
+  <p class:list={{'note-empty':!text}}>{text || '今天还没有写便利贴。'}</p>
+  <span class="note-signature" aria-hidden="true">Elio <span>↗</span></span>
+</aside>
+<style>
+  .daily-note{position:relative;max-width:360px;margin:4px 5px 32px auto;padding:24px 23px 16px;border:1px solid #dfd3ab;background:linear-gradient(135deg,#fff9dc,#f6edc9);color:#62563d;box-shadow:2px 9px 21px -14px #806b43aa;transform:rotate(-.7deg);border-radius:3px 3px 19px 3px}
+  .daily-note:after{content:'';position:absolute;right:0;bottom:0;width:19px;height:19px;border-radius:0 0 17px 0;background:linear-gradient(135deg,#ded1a0,#fffbeb);box-shadow:-2px -2px 4px #9c8c5910}
+  .note-tape{position:absolute;width:70px;height:19px;left:calc(50% - 35px);top:-10px;background:#cfba8e40;border-left:1px dashed #b29a5e30;border-right:1px dashed #b29a5e30;transform:rotate(3deg);backdrop-filter:blur(1px)}
+  .note-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#9d8a63;font-size:8px;letter-spacing:1.3px;margin-bottom:13px}.note-heading time{white-space:nowrap;font-variant-numeric:tabular-nums;font-size:9px;letter-spacing:.3px}
+  .daily-note p{font-family:var(--display-font);font-size:15px;line-height:1.95;white-space:pre-wrap;overflow-wrap:anywhere;letter-spacing:.4px;margin:0;max-height:7.8em;overflow-y:auto;scrollbar-width:thin}.daily-note p.note-empty{font-size:13px;color:#a18d6a}
+  .note-signature{display:block;text-align:right;font:italic 17px Georgia,serif;color:#a18a57;margin-top:8px}.note-signature span{font-size:12px;padding-left:5px}
+  :global(:root[data-theme=dark]) .daily-note{background:linear-gradient(135deg,#413c30,#302d26);border-color:#635a41;color:#e9ddbc;box-shadow:2px 9px 21px -14px #0009}:global(:root[data-theme=dark]) .daily-note:after{background:linear-gradient(135deg,#64583a,#403b2d)}
+  @media(max-width:600px){.daily-note{max-width:100%;margin:8px 3px 29px;padding:23px 21px 15px}.daily-note p{font-size:14px}}
+</style>
