@@ -43,6 +43,7 @@ const config = {
 // GitHub Actions 在构建时自动推导 github.io 地址；自定义域名优先在上面填写。
 export const siteConfig = {
   ...config,
+  revision: process.env.GITHUB_SHA || '',
   url: process.env.BLOG_SITE_URL || config.url,
   base: process.env.BLOG_BASE_PATH || config.base,
 };

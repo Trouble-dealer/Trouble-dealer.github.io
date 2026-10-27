@@ -3,6 +3,7 @@ import {readFile,writeFile,mkdir,open,unlink,access} from 'node:fs/promises';
 import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {articleFile,articleMarkdown,noteJSON} from './content.mjs';
+import {communityConfig} from '../../community.config.mjs';
 export const ROOT=fileURLToPath(new URL('../../',import.meta.url));
 export const STATE=join(ROOT,'.publisher');
 const REMOTE=/^(?:https:\/\/github\.com\/Trouble-dealer\/Trouble-dealer\.github\.io(?:\.git)?\/?|git@github\.com:Trouble-dealer\/Trouble-dealer\.github\.io(?:\.git)?)$/i;
@@ -95,19 +96,25 @@ export async function publish(content,job,{retry=false,runner=run}={}){
     await unlink(join(STATE,'pending.json'));
     job.sha=pending.sha;job.phase='等待网站部署';
     job.actions='https://github.com/Trouble-dealer/Trouble-dealer.github.io/actions';
-    const api=`https://api.github.com/repos/Trouble-dealer/Trouble-dealer.github.io/actions/runs?head_sha=${pending.sha}&per_page=5`;
     for(let attempt=0;attempt<20;attempt++){
       await new Promise(resolve=>setTimeout(resolve,8000));
       try{
-        const response=await fetch(api,{signal:AbortSignal.timeout(12000),headers:{Accept:'application/vnd.github+json'}});
+        // Verify the deployed artifact itself. No GitHub token or rate-limited
+        // anonymous Actions polling is needed for day-to-day publishing.
+        const response=await fetch(pending.url+'?published='+pending.sha,{signal:AbortSignal.timeout(12000),headers:{'Cache-Control':'no-cache'},cache:'no-store'});
         if(!response.ok)continue;
-        const data=await response.json();const run=data.workflow_runs?.find(run=>run.name==='Deploy blog to GitHub Pages');
-        if(!run)continue;
-        job.actions=run.html_url;
-        if(run.status!=='completed')continue;
-        if(run.conclusion!=='success')throw new Error('GitHub 部署未成功，请点“查看部署记录”查看原因。本地内容与提交仍然保留。');
+        const html=await response.text();
+        if(!html.includes(`<meta name="blog-revision" content="${pending.sha}">`))continue;
+        if(pending.kind==='article'){
+          job.phase='文章已上线，正在启用评论';
+          const sync=await fetch(communityConfig.url+'/functions/v1/sync-blog-posts',{method:'POST',headers:{apikey:communityConfig.publishableKey,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(20000)});
+          if(!sync.ok)continue;
+          const result=await sync.json();
+          const postId=decodeURIComponent(new URL(pending.url).pathname).split('/').filter(Boolean).at(-1);
+          if(!result.registered?.includes(postId))continue;
+        }
         job.phase='已发布';job.state='success';return;
-      }catch(error){if(error.message.startsWith('GitHub 部署'))throw error;}
+      }catch{ /* A temporary network failure must not discard an uploaded draft. */ }
     }
     job.state='uploaded';job.phase='已上传，部署状态暂未确认';job.log('GitHub 已收到内容。可打开部署记录查看进度，稍后刷新网站。\n');
   }finally{await lock.close();await unlink(join(STATE,'publish.lock')).catch(()=>{});}

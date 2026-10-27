@@ -20,6 +20,7 @@ const years = [...new Set(posts.map(p => yearOf(p.data.published)))];
 const path = decodeURI(Astro.url.pathname).replace(siteConfig.base.replace(/\/$/, ''), '');
 const nav = [{ label: '首页', path: '' }, { label: '归档', path: 'archive/' }, { label: '分类', path: 'categories/' }, { label: '留言', path: 'lounge/' }, { label: '观测', path: 'observatory/' }, { label: '友链', path: 'friends/' }, { label: '关于', path: 'about/' }, ...(authEnabled ? [{ label: '账户', path: 'account/' }] : [])];
 const pageTitle = title ? `${title} · ${siteConfig.title}` : `${siteConfig.title} · ${siteConfig.subtitle}`;
+const revision = /^[a-f0-9]{40}$/.test(siteConfig.revision) ? siteConfig.revision : '';
 const canonical = absolute(Astro.url.pathname.replace(siteConfig.base, ''));
 const heroTitleBreak = siteConfig.hero.title.indexOf('，');
 ---
@@ -31,6 +32,7 @@ const heroTitleBreak = siteConfig.hero.title.indexOf('，');
     <meta name="description" content={description} />
     <meta name="theme-color" content="#f4f6f4" />
     <meta name="generator" content={Astro.generator} />
+    {revision && <meta name="blog-revision" content={revision} />}
     {noindex && <meta name="robots" content="noindex,follow" />}
     <title>{pageTitle}</title>
     <link rel="canonical" href={canonical} />
