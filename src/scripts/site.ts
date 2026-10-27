@@ -1,11 +1,11 @@
-type Preferences = { theme: 'light' | 'dark' | 'system'; accent: 'sage' | 'blue' | 'rose' | 'violet'; skin: 'silver' | 'mono' | 'garden'; font: number; fireworks: boolean };
+type Preferences = { theme: 'light' | 'dark' | 'system'; accent: 'sage' | 'blue' | 'rose' | 'violet'; skin: 'silver' | 'mono' | 'garden' | 'klein' | 'ultramarine'; font: number; fireworks: boolean };
 const defaults: Preferences = { theme: 'system', accent: 'blue', skin: 'silver', font: 17, fireworks: true };
 let prefs: Preferences = { ...defaults };
 try {
   const saved = JSON.parse(localStorage.getItem('qiguang-prefs') || '{}');
   if (['light', 'dark', 'system'].includes(saved.theme)) prefs.theme = saved.theme;
   if (['sage', 'blue', 'rose', 'violet'].includes(saved.accent)) prefs.accent = saved.accent;
-  if (['silver', 'mono', 'garden'].includes(saved.skin)) prefs.skin = saved.skin;
+  if (['silver', 'mono', 'garden', 'klein', 'ultramarine'].includes(saved.skin)) prefs.skin = saved.skin;
   if (typeof saved.fireworks === 'boolean') prefs.fireworks = saved.fireworks;
   if (Number.isFinite(saved.font) && saved.font >= 15 && saved.font <= 20) prefs.font = saved.font;
 } catch { /* Privacy mode: preferences still work in memory. */ }
@@ -23,14 +23,18 @@ function applyPreferences() {
   document.querySelectorAll<HTMLInputElement>('input[name="skin"]').forEach(el => el.checked = el.value === prefs.skin);
   const fireworkSwitch = document.querySelector<HTMLInputElement>('#fireworks-enabled');
   if (fireworkSwitch) fireworkSwitch.checked = prefs.fireworks;
-  const names = { silver: '银雾', mono: '黑白', garden: '原野' };
+  const names = { silver: '银雾', mono: '黑白', garden: '原野', klein: '克莱因蓝 · 琉璃黄', ultramarine: '群青 · 橘黄' };
+  const fixedPair = ['mono','klein','ultramarine'].includes(prefs.skin);
+  document.querySelectorAll<HTMLInputElement>('input[name="accent"]').forEach(el=>el.disabled=fixedPair);
+  const accentHelp=document.querySelector('#accent-help');
+  if(accentHelp)accentHelp.textContent=fixedPair?'当前主题使用固定配色':'可自由选择点缀色';
   document.querySelectorAll('[data-theme-label]').forEach(el => el.textContent = `${names[prefs.skin]} · ${theme === 'dark' ? '深色' : '浅色'}${prefs.theme === 'system' ? ' · 随系统' : ''}`);
   const slider = document.querySelector<HTMLInputElement>('#reading-font');
   if (slider) slider.value = String(prefs.font);
   const output = document.querySelector('#font-output');
   if (output) output.textContent = `${prefs.font}px`;
   themeToggle?.setAttribute('aria-label', theme === 'dark' ? '切换为浅色' : '切换为深色');
-  const browserColors = { silver: ['#f2f3f5', '#11151d'], mono: ['#f0f0ee', '#121212'], garden: ['#f3f5f3', '#151b18'] };
+  const browserColors = { silver: ['#f2f3f5', '#11151d'], mono: ['#f0f0ee', '#121212'], garden: ['#f3f5f3', '#151b18'], klein: ['#012ea7','#080f27'], ultramarine: ['#2e56a3','#101a2a'] };
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', browserColors[prefs.skin][theme === 'dark' ? 1 : 0]);
 }
 function savePreferences() {
