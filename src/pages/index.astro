@@ -2,5 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Feed from '../components/Feed.astro';
 import DailyNote from '../components/DailyNote.astro';
+import DeskCat from '../components/DeskCat.astro';
 ---
-<BaseLayout hero><DailyNote/><Feed/></BaseLayout>
+<BaseLayout hero><div class="home-desk"><DeskCat/><DailyNote/></div><Feed/></BaseLayout>
+<style>
+  .home-desk{display:grid;grid-template-columns:minmax(165px,1fr) minmax(0,360px);gap:22px;align-items:center;margin:3px 0 27px;min-width:0}
+  .home-desk :global(.daily-note){margin:10px 5px 9px 0;width:calc(100% - 5px);min-width:0}
+  @media(max-width:660px){.home-desk{grid-template-columns:minmax(0,1fr);gap:7px;margin:6px 0 23px}.home-desk :global(.daily-note){grid-row:1;margin:8px 3px 6px;width:calc(100% - 6px)}}
+</style>

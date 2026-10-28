@@ -1,0 +1,9 @@
+.message-markdown{min-width:0;max-width:100%}
+:is(#lounge-form,#comment-form,#markdown-playground){min-width:0;max-width:100%;grid-template-columns:minmax(0,1fr)}
+.lounge-messages{grid-template-columns:minmax(0,1fr)}.lounge-message,.markdown-preview{min-width:0;max-width:100%}
+.message-markdown .math-slot{display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle;padding:.15em .1em;scrollbar-width:thin;overscroll-behavior-x:contain}
+.message-markdown .math-slot.math-block{display:block;padding:.35em .25em}
+.message-markdown .katex{font-size:1.12em;line-height:normal;white-space:nowrap;color:inherit}
+.message-markdown .katex-display{margin:.45em 0;text-align:center;min-width:fit-content}
+.message-markdown .math-error{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--muted);font-size:.9em}
+.markdown-tools [data-insert=math]{font-family:Georgia,serif;font-size:15px}

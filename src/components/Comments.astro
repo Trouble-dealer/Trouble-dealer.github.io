@@ -13,7 +13,7 @@ const { postId } = Astro.props;
     <p id="comments-status" class="form-status" role="status" aria-live="polite">正在加载评论…</p>
     <div id="comments-list" class="comments-list"></div>
     <button class="button secondary" id="comments-more" type="button" hidden>加载更早的评论</button>
-    {authEnabled && <div class="comment-editor"><p id="comment-guest" hidden><a href={`${url('account/')}?next=${encodeURIComponent(url(`posts/${postId}/#comments`))}`}>登录或注册</a>后参与讨论。</p><form id="comment-form" class="stack-form" hidden><label for="comment-body">写下你的想法</label><textarea id="comment-body" name="body" minlength="3" maxlength="2000" rows="5" required placeholder="3～2000 字，支持 Markdown：**粗体**、引用、列表和代码块。"></textarea><MarkdownTools/><p class="form-help">支持 Markdown，HTML 与图片嵌入不会显示。请勿填写敏感信息。</p><button class="button" type="submit">发表评论</button></form></div>}
+    {authEnabled && <div class="comment-editor"><p id="comment-guest" hidden><a href={`${url('account/')}?next=${encodeURIComponent(url(`posts/${postId}/#comments`))}`}>登录或注册</a>后参与讨论。</p><form id="comment-form" class="stack-form" hidden><label for="comment-body">写下你的想法</label><textarea id="comment-body" name="body" minlength="3" maxlength="2000" rows="5" required placeholder="3～2000 字，支持 Markdown：**粗体**、引用、列表和代码块。"></textarea><MarkdownTools/><p class="form-help">支持 Markdown 与 LaTeX：$…$ 为行内公式，$$…$$ 为独立公式。HTML 与图片嵌入不会显示。请勿填写敏感信息。</p><button class="button" type="submit">发表评论</button></form></div>}
     <noscript><p>评论需要启用 JavaScript。文章阅读不受影响。</p></noscript>
   </>}
 </section>

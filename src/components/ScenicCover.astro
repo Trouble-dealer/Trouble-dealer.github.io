@@ -1,0 +1,44 @@
+---
+interface Props{seed:string;variation:number;}
+const {seed,variation}=Astro.props;
+const hash=[...seed].reduce((sum,char)=>(sum*31+char.charCodeAt(0))>>>0,7);
+const scene=(['sea','clouds','dusk'] as const)[variation%3];
+const label={sea:'潮汐与远山',clouds:'云海与山峦',dusk:'暮色里的山谷'}[scene];
+const id='landscape-'+hash;
+---
+<div class:list={['scenic-cover','ambient-scene','scene-'+scene]} role="img" aria-label={label} data-scenery={scene}>
+  <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id={id+'-sky'} x2="0" y2="1"><stop stop-color="var(--scene-sky)"/><stop offset="1" stop-color="var(--scene-haze)"/></linearGradient><linearGradient id={id+'-water'} x2="0" y2="1"><stop stop-color="var(--scene-water)"/><stop offset="1" stop-color="var(--scene-near)"/></linearGradient></defs>
+    <rect width="1200" height="300" fill={`url(#${id}-sky)`}/>
+    <circle class="scene-sun" cx={scene==='dusk'?880:980} cy={scene==='dusk'?93:72} r={scene==='dusk'?29:24}/>
+    <g class="scene-cloud scene-motion"><path d="M90 76Q170 48 245 73T400 73M600 52Q662 30 740 53T920 53M820 115Q915 90 1010 112T1200 110"/></g>
+    <path class="scene-mountain-far" d="M0 182L95 151L159 162L257 104L345 157L416 126L512 173L622 132L717 164L815 113L892 154L1017 126L1102 158L1200 125V300H0Z"/>
+    {scene==='sea'?<>
+      <path fill={`url(#${id}-water)`} d="M0 182Q300 173 600 180T1200 176V300H0Z"/>
+      <g class="scene-water-lines"><path d="M78 199H244M294 207H378M553 193H677M822 201H1031M191 233H315M611 225H814M973 244H1118"/></g>
+      <path class="scene-shore" d="M0 284Q289 261 528 276T1200 270V300H0Z"/>
+      <g class="scene-wave scene-motion"><path d="M-400 255Q-250 233-100 252T200 252T500 252T800 252T1100 252T1400 252T1700 252V275Q1550 262 1400 272T1100 272T800 272T500 272T200 272T-100 272T-400 272Z"/></g>
+      <g class="scene-wave scene-wave-back scene-motion"><path d="M-400 231Q-250 210-100 227T200 227T500 227T800 227T1100 227T1400 227T1700 227V236H-400Z"/></g>
+    </>:<>
+      <path class="scene-mountain-mid" d="M0 247Q140 144 289 191T545 210T804 190T1040 196L1200 175V300H0Z"/>
+      <g class="scene-mist scene-motion"><path d="M-100 237Q120 195 338 235T760 230T1310 233V270H-100Z"/></g>
+      <path class="scene-mountain-near" d="M0 269Q196 206 340 257T663 262T1000 255T1200 255V300H0Z"/>
+      <path class="scene-trail" d="M680 300Q614 279 684 265T752 238"/>
+    </>}
+  </svg>
+  <span class="scenic-caption" aria-hidden="true">{label}<i> / </i>FIELD MOMENT</span>
+</div>
+<script>import '../scripts/scenery';</script>
+<style>
+  .scenic-cover{--scene-sky:#c9dce3;--scene-haze:#ecede4;--scene-water:#92adb3;--scene-near:#597e8b;--scene-far:#8da4a9;--scene-mid:#799295;--scene-sand:#d8d4c7;--scene-sun:#f5ecce;--scene-foam:#edf4ee;position:relative;width:100%;height:100%;overflow:hidden;background:var(--scene-sky);isolation:isolate}
+  .scenic-cover svg{display:block;width:100%;height:100%}.scene-sun{fill:var(--scene-sun);opacity:.78}.scene-cloud{fill:none;stroke:var(--scene-foam);stroke-width:9;stroke-linecap:round;opacity:.35;animation:scenic-cloud 18s ease-in-out infinite;animation-play-state:paused}.scene-mountain-far{fill:var(--scene-far);opacity:.64}.scene-mountain-mid{fill:var(--scene-mid)}.scene-mountain-near{fill:var(--scene-near)}.scene-shore{fill:var(--scene-sand)}.scene-wave{fill:var(--scene-foam);opacity:.5;animation:scenic-wave 11s ease-in-out infinite;animation-play-state:paused}.scene-wave-back{opacity:.22;animation-direction:reverse;animation-duration:15s}.scene-water-lines{fill:none;stroke:var(--scene-foam);stroke-width:1;opacity:.35}.scene-mist{fill:var(--scene-foam);opacity:.3;animation:scenic-cloud 23s ease-in-out infinite;animation-play-state:paused}.scene-trail{fill:none;stroke:var(--scene-sand);stroke-width:3;opacity:.6}
+  .scene-clouds{--scene-sky:#d0dce4;--scene-haze:#efece5;--scene-far:#a4b6bc;--scene-mid:#8a9fa9;--scene-near:#667f90}
+  .scene-dusk{--scene-sky:#c9bfcf;--scene-haze:#f0d8c2;--scene-far:#b3a4b4;--scene-mid:#9c8fa6;--scene-near:#756f88;--scene-sun:#f5dfb4}
+  .scenic-caption{position:absolute;left:21px;bottom:15px;z-index:1;font:8px/1.6 Consolas,"Microsoft YaHei",sans-serif;letter-spacing:2px;color:#f9fbf2;text-shadow:0 1px 8px #172d3b80}.scenic-caption i{font-style:normal;opacity:.6;padding:0 8px}
+  :global(html[data-theme=dark]) .scenic-cover{--scene-sky:#283d50;--scene-haze:#6e8592;--scene-water:#536f81;--scene-near:#2f4b60;--scene-far:#5e7787;--scene-mid:#405e72;--scene-sand:#59666b;--scene-sun:#dfdac3;--scene-foam:#bdd2d5}
+  :global(html[data-theme=dark]) .scene-dusk{--scene-sky:#39384e;--scene-haze:#9d8189;--scene-far:#6a607a;--scene-mid:#514e6b;--scene-near:#353e58;--scene-sun:#dfcbb3}
+  :global(html[data-motion-active=true]) .scenic-cover[data-in-view] .scene-motion{animation-play-state:running}
+  @keyframes scenic-wave{50%{transform:translate(-110px,5px)}}@keyframes scenic-cloud{50%{transform:translate(28px,-3px)}}
+  @media(max-width:600px){.scenic-caption{font-size:7px;left:15px;bottom:11px;letter-spacing:1.5px}}
+  @media(prefers-reduced-motion:reduce){.scene-motion{animation:none!important}}
+</style>

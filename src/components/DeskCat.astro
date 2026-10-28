@@ -1,0 +1,34 @@
+<section class="cat-companion ambient-scene" aria-label="小站里的猫" data-desk-cat>
+  <button type="button" class="cat-toy" aria-label="摸摸小猫" aria-describedby="desk-cat-status">
+    <svg viewBox="0 0 280 220" aria-hidden="true">
+      <ellipse class="cat-perch" cx="140" cy="197" rx="100" ry="10"/>
+      <g class="cat-tail"><path d="M191 176C241 195 266 158 243 144C225 133 215 151 227 157"/></g>
+      <g class="cat-body"><path class="cat-fur" d="M97 126C74 151 83 194 109 197H184C207 190 196 138 178 125Z"/><path class="cat-patch" d="M161 131C193 119 206 171 189 187C162 192 153 161 161 131Z"/><path class="cat-line" d="M122 166V195M154 167V195"/><path class="cat-fur cat-paw" d="M104 173C80 170 75 146 89 141C102 140 98 155 114 155"/>
+      <g class="cat-head"><path class="cat-fur" d="M78 94L75 42Q76 35 83 39L115 59Q139 51 162 59L192 38Q200 34 200 43L198 98C202 148 75 152 78 94Z"/><path class="cat-patch" d="M161 59L192 38Q200 34 200 43L198 98Q177 102 161 59Z"/><path class="cat-ear" d="M83 48L87 75L105 62ZM188 49L173 62L191 75Z"/>
+        <g class="cat-open-eyes"><ellipse class="cat-eye-white" cx="113" cy="101" rx="12" ry="13"/><ellipse class="cat-eye-white" cx="168" cy="101" rx="12" ry="13"/><g class="cat-pupils"><ellipse cx="114" cy="102" rx="5" ry="9"/><ellipse cx="167" cy="102" rx="5" ry="9"/><circle class="cat-eye-glint" cx="116" cy="99" r="2"/><circle class="cat-eye-glint" cx="169" cy="99" r="2"/></g></g>
+        <g class="cat-closed-eyes cat-line"><path d="M103 102Q113 92 123 102M158 102Q168 92 178 102"/></g>
+        <path class="cat-nose" d="M135 113Q140 110 145 113L140 118Z"/><path class="cat-line" d="M140 118V122M140 122Q133 129 128 123M140 122Q147 129 152 123M96 116L65 110M97 124L65 127M185 116L216 110M184 124L216 127"/>
+      </g></g>
+    </svg>
+    <span class="cat-hearts" aria-hidden="true"><i>♡</i><i>♡</i><i>✧</i></span>
+  </button>
+  <div class="cat-caption"><span class="eyebrow">A LITTLE COMPANY</span><p id="desk-cat-status" role="status" aria-live="polite">歇一会儿，摸摸小猫。</p><small>陪你把日子慢慢写下来。</small></div>
+</section>
+<script>import '../scripts/desk-cat';import '../scripts/scenery';</script>
+<style>
+  .cat-companion{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:6px 0 17px;color:var(--muted)}
+  .cat-toy{position:relative;width:min(100%,210px);height:161px;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation;border-radius:42%}
+  .cat-toy:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.cat-toy svg{width:100%;height:100%;overflow:visible}
+  .cat-perch{fill:var(--accent-soft);opacity:.75}.cat-fur{fill:#edf0ee;stroke:#45505b;stroke-width:3;stroke-linejoin:round}.cat-patch{fill:#37424d}.cat-tail path{fill:none;stroke:#37424d;stroke-width:16;stroke-linecap:round}.cat-ear,.cat-nose{fill:#cf9f9f}.cat-line{fill:none;stroke:#45505b;stroke-width:2.5;stroke-linecap:round}.cat-eye-white{fill:#d8dfbc;stroke:#45505b;stroke-width:1.7}.cat-pupils{fill:#28323b;translate:var(--eye-x,0px) var(--eye-y,0px)}.cat-eye-glint{fill:#fff}.cat-closed-eyes{display:none}
+  .cat-body{transform-box:fill-box;transform-origin:center bottom;animation:cat-breathe 4s ease-in-out infinite;animation-play-state:paused}.cat-open-eyes{animation:cat-blink 7s infinite;animation-play-state:paused;transform-origin:center;transform-box:fill-box}
+  .cat-tail{transform-origin:193px 177px;animation:cat-tail 5.5s ease-in-out infinite;animation-play-state:paused}
+  .cat-caption{text-align:center;max-width:240px}.cat-caption .eyebrow{font-size:7px;letter-spacing:2px;opacity:.65}.cat-caption p{font-family:var(--display-font);font-size:13px;line-height:1.8;margin:7px 0 2px;color:var(--text)}.cat-caption small{font-size:9px;letter-spacing:.5px}
+  .cat-hearts{position:absolute;inset:0;pointer-events:none}.cat-hearts i{position:absolute;left:28%;top:12%;font-style:normal;font-size:21px;color:var(--accent);opacity:0}.cat-hearts i:nth-child(2){left:70%;top:20%;font-size:17px;animation-delay:.13s}.cat-hearts i:nth-child(3){left:56%;top:3%;font-size:14px;animation-delay:.2s}
+  .cat-companion.is-petted .cat-open-eyes{display:none}.cat-companion.is-petted .cat-closed-eyes{display:block}.cat-companion.is-petted .cat-paw{transform:rotate(-15deg);transform-origin:111px 168px}.cat-companion.is-petted .cat-head{transform:rotate(-4deg);transform-origin:140px 125px}
+  :global(html[data-motion-active=true]) .cat-companion[data-in-view] :is(.cat-body,.cat-tail,.cat-open-eyes){animation-play-state:running}
+  :global(html[data-motion-active=true]) .cat-companion.is-petted .cat-hearts i{animation:cat-heart 1.9s ease-out both}
+  :global(html:not([data-motion-active=true])) .cat-companion.is-petted :is(.cat-head,.cat-paw){transform:none}
+  @keyframes cat-breathe{50%{transform:scaleY(.98)}}@keyframes cat-tail{50%{transform:rotate(-7deg)}}@keyframes cat-blink{0%,43%,47%,100%{scale:1 1}45%{scale:1 .06}}@keyframes cat-heart{0%{opacity:0;translate:0 5px}20%{opacity:.8}100%{opacity:0;translate:8px -28px}}
+  @media(max-width:660px){.cat-companion{flex-direction:row;gap:9px;justify-content:flex-start;padding:0 12px 8px}.cat-toy{width:115px;height:104px;flex-shrink:0}.cat-caption{text-align:left}.cat-caption p{font-size:12px;margin-top:5px}.cat-caption small{font-size:8px}.cat-caption .eyebrow{font-size:6px;letter-spacing:1.5px}}
+  @media(prefers-reduced-motion:reduce){.cat-body,.cat-tail,.cat-open-eyes,.cat-hearts i{animation:none!important}.cat-hearts{display:none}.cat-companion.is-petted :is(.cat-head,.cat-paw){transform:none}}
+</style>
