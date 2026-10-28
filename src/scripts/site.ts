@@ -1,5 +1,5 @@
-type Preferences = { theme: 'light' | 'dark' | 'system'; accent: 'sage' | 'blue' | 'rose' | 'violet'; skin: 'silver' | 'mono' | 'garden' | 'ultramarine' | 'lime' | 'pink'; font: number; fireworks: boolean };
-const defaults: Preferences = { theme: 'system', accent: 'blue', skin: 'silver', font: 17, fireworks: true };
+type Preferences = { theme: 'light' | 'dark' | 'system'; accent: 'sage' | 'blue' | 'rose' | 'violet'; skin: 'silver' | 'mono' | 'garden' | 'ultramarine' | 'lime' | 'pink'; font: number; fireworks: boolean; motion: boolean };
+const defaults: Preferences = { theme: 'system', accent: 'blue', skin: 'silver', font: 17, fireworks: true, motion: true };
 let prefs: Preferences = { ...defaults };
 try {
   const saved = JSON.parse(localStorage.getItem('qiguang-prefs') || '{}');
@@ -7,6 +7,7 @@ try {
   if (['sage', 'blue', 'rose', 'violet'].includes(saved.accent)) prefs.accent = saved.accent;
   if (['silver', 'mono', 'garden', 'ultramarine', 'lime', 'pink'].includes(saved.skin)) prefs.skin = saved.skin;
   if (typeof saved.fireworks === 'boolean') prefs.fireworks = saved.fireworks;
+  if (typeof saved.motion === 'boolean') prefs.motion = saved.motion;
   if (Number.isFinite(saved.font) && saved.font >= 15 && saved.font <= 20) prefs.font = saved.font;
 } catch { /* Privacy mode: preferences still work in memory. */ }
 const systemTheme = matchMedia('(prefers-color-scheme: dark)');
@@ -17,12 +18,15 @@ function applyPreferences() {
   document.documentElement.dataset.accent = prefs.accent;
   document.documentElement.dataset.skin = prefs.skin;
   document.documentElement.dataset.fireworks = String(prefs.fireworks);
+  document.documentElement.dataset.motion = String(prefs.motion);
   document.documentElement.style.setProperty('--reading-size', `${prefs.font}px`);
   document.querySelectorAll<HTMLInputElement>('input[name="theme"]').forEach(el => el.checked = el.value === prefs.theme);
   document.querySelectorAll<HTMLInputElement>('input[name="accent"]').forEach(el => el.checked = el.value === prefs.accent);
   document.querySelectorAll<HTMLInputElement>('input[name="skin"]').forEach(el => el.checked = el.value === prefs.skin);
   const fireworkSwitch = document.querySelector<HTMLInputElement>('#fireworks-enabled');
   if (fireworkSwitch) fireworkSwitch.checked = prefs.fireworks;
+  const motionSwitch = document.querySelector<HTMLInputElement>('#interface-motion');
+  if (motionSwitch) motionSwitch.checked = prefs.motion;
   const names = { silver: '银雾', mono: '黑白', garden: '原野', ultramarine: '群青 · 橘黄', lime: '青柠绿 · 炭灰黑', pink: '甜酷粉 · 黑炭石' };
   const fixedPair = ['ultramarine','lime','pink'].includes(prefs.skin);
   document.querySelectorAll<HTMLInputElement>('input[name="accent"]').forEach(el=>el.disabled=fixedPair);
@@ -62,6 +66,7 @@ if (settings && settingsOpen) {
   settings.querySelectorAll<HTMLInputElement>('input[name="accent"]').forEach(el => el.addEventListener('change', () => { prefs.accent = el.value as Preferences['accent']; savePreferences(); }));
   settings.querySelectorAll<HTMLInputElement>('input[name="skin"]').forEach(el => el.addEventListener('change', () => { prefs.skin = el.value as Preferences['skin']; savePreferences(); }));
   settings.querySelector<HTMLInputElement>('#fireworks-enabled')?.addEventListener('change', event => { prefs.fireworks = (event.target as HTMLInputElement).checked; savePreferences(); });
+  settings.querySelector<HTMLInputElement>('#interface-motion')?.addEventListener('change', event => { prefs.motion = (event.target as HTMLInputElement).checked; savePreferences(); });
   settings.querySelector<HTMLInputElement>('#reading-font')?.addEventListener('input', e => { prefs.font = Number((e.target as HTMLInputElement).value); savePreferences(); });
   settings.querySelector('#reset-settings')?.addEventListener('click', () => { prefs = { ...defaults }; savePreferences(); });
 }
